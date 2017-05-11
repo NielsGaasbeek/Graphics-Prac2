@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace template
+namespace Application
 {
     class Camera
     {

@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenTK;
 
-namespace template
+namespace Application
 {
     class Light
     {
+        Vector3 location;
+        float red, blue, green;
+
+        public Light(Vector3 pos, float red, float green, float blue)
+        {
+            location = pos;
+
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+        }
+
     }
 }

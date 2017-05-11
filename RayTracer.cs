@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Template
+namespace Application
 {
     class RayTracer
     {

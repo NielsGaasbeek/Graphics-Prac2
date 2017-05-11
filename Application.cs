@@ -6,7 +6,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
-namespace Template
+namespace Application
 {
     public class OpenTKApp : GameWindow
     {
