@@ -8,5 +8,17 @@ namespace Application
 {
     class Scene
     {
+        IList<Light> lightList;
+        IList<Primitive> sceneObjects;
+
+        public Scene()
+        {
+
+        }
+
+        public void Intersect()
+        {
+
+        }
     }
 }
