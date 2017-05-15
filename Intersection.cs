@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 
-namespace template
+namespace Application
 {
     class Intersection
     {
+        Vector3 intersectNorm;
+        float intersectDist;
+        Primitive intersectObj;
+
     }
 }
