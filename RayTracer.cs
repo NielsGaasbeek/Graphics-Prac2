@@ -4,6 +4,13 @@ using System.IO;
 
 namespace Application
 {
+    struct Ray
+    {
+        Vector3 O; //origin
+        Vector3 D; //Direction
+        float t; //distance
+    }
+
     class RayTracer
     {
         // member variables
@@ -15,8 +22,8 @@ namespace Application
         // initialize
         public void Init()
         {
-            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, -1), screen);
-            debugCam = new Camera(new Vector3(5, 5, 10), new Vector3(0, -1, 0), screen);
+            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, -1));
+            debugCam = new Camera(new Vector3(5, 5, 10), new Vector3(0, -1, 0));
 
             scene = new Scene();
         }
@@ -25,13 +32,6 @@ namespace Application
         public void Tick()
         {
             screen.Clear(0);
-            screen.Print("hello world", 2, 2, 0xffffff);
-            screen.Line(2, 20, 160, 20, 0xff0000);
-        }
-
-        //maak een ray
-        public void Ray()
-        {
 
         }
     }

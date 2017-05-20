@@ -9,14 +9,22 @@ namespace Application
 {
     class Camera
     {
-        Vector3 position, direction;
-        Surface Screenplane;
+        Vector3 position, direction = new Vector3(0,0,1), screenCenter;
+        Vector3 p0, p1, p2; //screen corners
+        float d = 1; //for FOV adjustment
 
-        public Camera(Vector3 position, Vector3 direction, Surface Screenplane)
+        public Camera(Vector3 position, Vector3 direction)
         {
             this.position = position;
             this.direction = direction;
-            this.Screenplane = Screenplane;         
+
+            //screen plane, adjust FOV by altering d
+            screenCenter = position + (d *direction);
+
+            //corners, transform camera by multiplying p0,1,2
+            p0 = screenCenter + new Vector3(-1, -1, 0); //Only if direction (0,0,1)
+            p1 = screenCenter + new Vector3(1, -1, 0); //Only if direction (0,0,1)
+            p2 = screenCenter + new Vector3(-1, 1, 0); //Only if direction (0,0,1)
         }
 
     }
