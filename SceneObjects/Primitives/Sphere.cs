@@ -22,7 +22,8 @@ namespace Application
             float pSquared = dotProduct(q, q);
             if (pSquared > this.radius * this.radius) { return; }
             t -= (float)Math.Sqrt(this.radius * this.radius - pSquared);
-            if ((t < R.t) && (t > 0)) { R.t = t; }
+            //if ((t < R.t) && (t > 0)) { R.t = t; }
+            R.t = Math.Min(R.t, Math.Max(0, t));
         }
 
         public Vector3 CenterPos

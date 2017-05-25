@@ -15,7 +15,10 @@ namespace Application
 
         public void Intersect(Ray R)
         {
-
+            foreach(Primitive P in sceneObjects)
+            {
+                P.FindIntersection(R);
+            }
 
         }
 
