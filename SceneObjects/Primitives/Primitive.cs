@@ -12,9 +12,9 @@ namespace Application
             primitiveColor = color;
         }
 
-        public virtual float FindIntersection(Ray R)
+        public virtual void FindIntersection(Ray R)
         {
-            return -1;
+
         }
 
         public float dotProduct(Vector3 A, Vector3 B)

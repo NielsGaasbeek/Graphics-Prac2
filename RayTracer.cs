@@ -21,10 +21,11 @@ namespace Application
         public Sphere Sphere1, Sphere2, Sphere3;
 
         Ray ray = new Ray();
+        Vector3 point = new Vector3(0, 0, 0);
 
         //coordinate system
         float xmin = -5; float xmax = 5;
-        float ymin = -5; float ymax = 5;
+        float ymin = -1; float ymax = 9;
         float scale;
 
         float a;
@@ -35,15 +36,16 @@ namespace Application
             scale = (screen.height / (ymax - ymin));
 
             scene = new Scene(); //create the scene
-            renderCam = new Camera(new Vector3(0, 0, -4), new Vector3(0, 0, 1)); //create the camera
+            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
+            ray.O = renderCam.Position;
 
             Light light = new Light(new Vector3(5, 5, 5), new Vector3(1, 1, 1)); //add a light to the scene
             scene.Lights.Add(light);
 
             Plane Floor = new Plane(new Vector3(0, 0, 0), 0, new Vector3(0.1f, 0.1f, 0.1f)); //gray floor plane
-            Sphere1 = new Sphere(new Vector3(-3, 0, 3), 1, new Vector3(255, 0, 0)); //red sphere
-            Sphere2 = new Sphere(new Vector3(0, 0, 3), 1, new Vector3(0, 255, 0)); //green sphere
-            Sphere3 = new Sphere(new Vector3(3, 0, 3), 1, new Vector3(0, 0, 255)); //blue sphere
+            Sphere1 = new Sphere(new Vector3(-3, 0, 7), 1, new Vector3(255, 0, 0)); //red sphere
+            Sphere2 = new Sphere(new Vector3(0, 0, 7), 1, new Vector3(0, 255, 0)); //green sphere
+            Sphere3 = new Sphere(new Vector3(3, 0, 7), 1, new Vector3(0, 0, 255)); //blue sphere
 
             scene.Primitives.Add(Floor); //add the primitives
             scene.Primitives.Add(Sphere1);
@@ -56,6 +58,20 @@ namespace Application
             GL.Color3(1.0f, 0.0f, 0.0f);
             GL.Begin(PrimitiveType.Triangles);
 
+            for(int x = 0; x < 512; x++)
+            {
+                for(int y = 0; y < 512; y++)
+                {
+                    float u = (float)(renderCam.p1.X + (renderCam.p0.X - renderCam.p1.X) * (x + 0.5)) / 512;
+                    float v = (float)(renderCam.p2.Y + (renderCam.p0.Y - renderCam.p2.Y) * (y + 0.5)) / 512;
+
+                    point = new Vector3(u, v, 1);
+
+                    ray.D = point - renderCam.Position;
+                }
+            }
+
+
             GL.End();
         }
 
@@ -63,8 +79,8 @@ namespace Application
         public void Tick()
         {
             a += 0.01f;
-            //screen.Clear(0);
-            screen.Line(TX(5), TY(5), TX(5), TY(-5), 0xffffff);
+            screen.Clear(0);
+            screen.Line(TX(5), TY(ymax), TX(5), TY(ymin), 0xffffff);
 
             //debug view
             //camera
@@ -84,6 +100,7 @@ namespace Application
             screen.Plot(TX((float)(Sphere3.CenterPos.X + Sphere3.Radius * Math.Cos(a))) + 512, TY((float)(Sphere3.CenterPos.Z + Sphere3.Radius * Math.Sin(a))),
                 CreateColor((int)Sphere3.Color.X, (int)Sphere3.Color.Y, (int)Sphere3.Color.Z));
 
+            //rays
 
 
         }
