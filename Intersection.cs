@@ -4,7 +4,7 @@ namespace Application
 {
     class Intersection
     {
-        Vector3 intersectNorm;
+        //Vector3 intersectNorm;
         float intersectDist;
         Primitive intersectObj;
 
@@ -12,6 +12,16 @@ namespace Application
         {
             intersectDist = t;
             intersectObj = P;
+        }
+
+        public float Distance
+        {
+            get { return intersectDist; }
+        }
+
+        public Primitive Primitive
+        {
+            get { return intersectObj; }
         }
     }
 }

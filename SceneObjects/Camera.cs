@@ -5,7 +5,7 @@ namespace Application
     class Camera
     {
         Vector3 position, direction = new Vector3(0,0,1), screenCenter;
-        Vector3 p0, p1, p2; //screen corners
+        public Vector3 p0, p1, p2; //screen corners
         float d = 1; //for FOV adjustment
 
         public Camera(Vector3 position, Vector3 direction)

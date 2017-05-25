@@ -13,10 +13,11 @@ namespace Application
             distance = d;
         }
 
-        public override void FindIntersection(Ray R)
+        public override float FindIntersection(Ray R)
         {
             float t = -(dotProduct(R.O, normalVector) + distance) / (dotProduct(R.D, normalVector));
-            if ((t < R.t) && (t > 0)) { R.t = t; }
+            //if ((t < R.t) && (t > 0)) { R.t = t; }
+            return t;
         }
     }
 }

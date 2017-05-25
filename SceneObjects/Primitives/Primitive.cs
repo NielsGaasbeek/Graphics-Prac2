@@ -1,5 +1,5 @@
 ﻿using OpenTK;
-using System;
+using System.Collections.Generic;
 
 namespace Application
 {
@@ -12,14 +12,19 @@ namespace Application
             primitiveColor = color;
         }
 
-        public virtual void FindIntersection(Ray R)
+        public virtual float FindIntersection(Ray R)
         {
-
+            return -1;
         }
 
         public float dotProduct(Vector3 A, Vector3 B)
         {
             return A.X * B.X + A.Y * B.Y + A.Z * B.Z;
+        }
+
+        public Vector3 Color
+        {
+            get { return primitiveColor; }
         }
     }
 }

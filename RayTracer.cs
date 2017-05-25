@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using System;
 
 namespace Application
@@ -15,8 +16,9 @@ namespace Application
         // member variables
         public Surface screen;
 
-        public Camera renderCam, debugCam;
+        public Camera renderCam;
         public Scene scene;
+        public Sphere Sphere1, Sphere2, Sphere3;
 
         Ray ray = new Ray();
 
@@ -25,56 +27,71 @@ namespace Application
         float ymin = -5; float ymax = 5;
         float scale;
 
+        float a;
+
         //initialize
         public void Init()
         {
             scale = (screen.height / (ymax - ymin));
 
-            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, -1)); //create the cameras, one for rendering, one for debug view
-            debugCam = new Camera(new Vector3(5, 5, 10), new Vector3(0, -1, 0)); //not sure if this is how its supposed to be
-
             scene = new Scene(); //create the scene
+            renderCam = new Camera(new Vector3(0, 0, -4), new Vector3(0, 0, 1)); //create the camera
 
             Light light = new Light(new Vector3(5, 5, 5), new Vector3(1, 1, 1)); //add a light to the scene
             scene.Lights.Add(light);
 
-            Plane Floor = new Plane(new Vector3(0, 1, 0), 0, new Vector3(0.1f, 0.1f, 0.1f)); //gray floor plane
-            Sphere Sphere1 = new Sphere(new Vector3(3, 3, 2), 2, new Vector3(1, 0, 0)); //red sphere
-            //Sphere Sphere2 = new Sphere(new Vector3(0, 0, 0), 2, new Vector3(0, 1, 0)); //green sphere
-            //Sphere Sphere3 = new Sphere(new Vector3(0, 0, 0), 2, new Vector3(0, 0, 1)); //blue sphere
+            Plane Floor = new Plane(new Vector3(0, 0, 0), 0, new Vector3(0.1f, 0.1f, 0.1f)); //gray floor plane
+            Sphere1 = new Sphere(new Vector3(-3, 0, 3), 1, new Vector3(255, 0, 0)); //red sphere
+            Sphere2 = new Sphere(new Vector3(0, 0, 3), 1, new Vector3(0, 255, 0)); //green sphere
+            Sphere3 = new Sphere(new Vector3(3, 0, 3), 1, new Vector3(0, 0, 255)); //blue sphere
 
             scene.Primitives.Add(Floor); //add the primitives
             scene.Primitives.Add(Sphere1);
-            //scene.Primitives.Add(Sphere2);
-            //scene.Primitives.Add(Sphere3);
+            scene.Primitives.Add(Sphere2);
+            scene.Primitives.Add(Sphere3);
+        }
+
+        public void Render()
+        {
+            GL.Color3(1.0f, 0.0f, 0.0f);
+            GL.Begin(PrimitiveType.Triangles);
+
+            GL.End();
         }
 
         // tick: renders one frame
         public void Tick()
         {
-            screen.Clear(0);
+            a += 0.01f;
+            //screen.Clear(0);
             screen.Line(TX(5), TY(5), TX(5), TY(-5), 0xffffff);
 
-            for (int x = 0; x < 512; x++)
-            {
-                for (int y = 0; y < screen.height; y++)
-                {
-                    //create ray
-                    ray.O = renderCam.Position;
-                    ray.D = new Vector3(TX(x), TY(y), 0) - renderCam.Position;
+            //debug view
+            //camera
+            screen.Plot(TX(renderCam.Position.X) + 512, TY(renderCam.Position.Z), 0xffffff); //x+512 voor rechterkant scherm
+            screen.Plot(TX(renderCam.Position.X) + 513, TY(renderCam.Position.Z), 0xffffff);
 
-                    //find closest intersection and its surface normal n
-                    scene.Intersect(ray);
+            //screen plane
+            screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
 
-                    //set pixel color computed from hit point, light and n
-                }
-            }
+            //spheres
+            screen.Plot(TX((float)(Sphere1.CenterPos.X + Sphere1.Radius * Math.Cos(a))) + 512, TY((float)(Sphere1.CenterPos.Z + Sphere1.Radius * Math.Sin(a))), 
+                CreateColor((int)Sphere1.Color.X, (int)Sphere1.Color.Y, (int)Sphere1.Color.Z));
+
+            screen.Plot(TX((float)(Sphere2.CenterPos.X + Sphere2.Radius * Math.Cos(a))) + 512, TY((float)(Sphere2.CenterPos.Z + Sphere2.Radius * Math.Sin(a))),
+                CreateColor((int)Sphere2.Color.X, (int)Sphere2.Color.Y, (int)Sphere2.Color.Z));
+
+            screen.Plot(TX((float)(Sphere3.CenterPos.X + Sphere3.Radius * Math.Cos(a))) + 512, TY((float)(Sphere3.CenterPos.Z + Sphere3.Radius * Math.Sin(a))),
+                CreateColor((int)Sphere3.Color.X, (int)Sphere3.Color.Y, (int)Sphere3.Color.Z));
+
+
+
         }
 
         public int TX(float x)
         {
             float tx = x + xmax;
-            tx = scale * tx + ((512 / 2) + xmin * scale);
+            tx = scale * tx + ((screen.width / 4) + xmin * scale);
 
             return (int)tx;
         }
@@ -85,6 +102,11 @@ namespace Application
             ty *= scale;
 
             return (int)ty;
+        }
+
+        int CreateColor(int red, int green, int blue)
+        {
+            return (red << 16) + (green << 8) + blue;
         }
     }
 }
