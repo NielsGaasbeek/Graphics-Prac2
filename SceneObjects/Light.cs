@@ -2,7 +2,7 @@
 
 namespace Application
 {
-    class Light
+    public class Light
     {
         Vector3 location, color;
 

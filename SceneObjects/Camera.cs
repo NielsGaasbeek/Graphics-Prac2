@@ -1,9 +1,4 @@
 ﻿using OpenTK;
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
 
 namespace Application
 {
@@ -21,10 +16,15 @@ namespace Application
             //screen plane, adjust FOV by altering d
             screenCenter = position + (d *direction);
 
-            //corners, transform camera by multiplying p0,1,2
+            //corners, transform camera by multiplying E,p0,1,2 with camera matrix
             p0 = screenCenter + new Vector3(-1, -1, 0); //Only if direction (0,0,1)
             p1 = screenCenter + new Vector3(1, -1, 0); //Only if direction (0,0,1)
             p2 = screenCenter + new Vector3(-1, 1, 0); //Only if direction (0,0,1)
+        }
+
+        public Vector3 Position
+        {
+            get { return position; }
         }
 
     }

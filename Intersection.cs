@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
+﻿using OpenTK;
 
 namespace Application
 {
@@ -13,5 +8,10 @@ namespace Application
         float intersectDist;
         Primitive intersectObj;
 
+        public Intersection(float t, Primitive P)
+        {
+            intersectDist = t;
+            intersectObj = P;
+        }
     }
 }

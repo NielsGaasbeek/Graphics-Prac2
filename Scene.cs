@@ -1,31 +1,38 @@
-﻿using System;
+﻿using OpenTK;
 using System.Collections.Generic;
-using OpenTK;
 
 namespace Application
 {
     class Scene
     {
-        IList<Light> lightList;
-        IList<Primitive> sceneObjects;
+        protected List<Light> lightList = new List<Light>();
+        protected List<Primitive> sceneObjects = new List<Primitive>();
 
         public Scene()
         {
-            Plane Floor = new Plane(new Vector3(0, 1, 0), 0, new Vector3(0.1f, 0.1f, 0.1f)); //grijze vloer plane
-            Sphere Sphere1 = new Sphere(new Vector3(-1, 0, 5), 2, new Vector3(1, 0, 0)); //rode bol
-            Sphere Sphere2 = new Sphere(new Vector3(0, 0, 5), 2, new Vector3(0, 1, 0)); //groene bol
-            Sphere Sphere3 = new Sphere(new Vector3(1, 0, 5), 2, new Vector3(0, 0, 1)); //blauwe bol
 
-            //zet ze in de lijst
-            sceneObjects.Add(Floor);
-            sceneObjects.Add(Sphere1);
-            sceneObjects.Add(Sphere2);
-            sceneObjects.Add(Sphere3);
         }
 
-        public void Intersect()
+        public Intersection Intersect(Ray R)
         {
+            Intersection closest;
 
+            foreach (Primitive P in sceneObjects)
+            {
+                P.FindIntersection(R);
+            }
+
+            return closest;
+        }
+
+        public IList<Light> Lights
+        {
+            get { return lightList; }
+        }
+
+        public IList<Primitive> Primitives
+        {
+            get { return sceneObjects; }
         }
     }
 }
