@@ -20,6 +20,7 @@ namespace Application
             p0 = screenCenter + new Vector3(-1, -1, 0); //Only if direction (0,0,1)
             p1 = screenCenter + new Vector3(1, -1, 0); //Only if direction (0,0,1)
             p2 = screenCenter + new Vector3(-1, 1, 0); //Only if direction (0,0,1)
+            //waarom maar 3 corners?
         }
 
         public Vector3 Position
