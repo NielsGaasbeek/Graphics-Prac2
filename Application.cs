@@ -16,9 +16,6 @@ namespace Application
         protected override void OnLoad(EventArgs e)
         {
             // called upon app init
-            GL.ClearColor(Color.Black);
-            GL.Enable(EnableCap.Texture2D);
-            GL.Disable(EnableCap.DepthTest);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             ClientSize = new Size(1024, 512);
             tracer = new RayTracer();
@@ -49,6 +46,11 @@ namespace Application
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+            GL.ClearColor(Color.Black);
+            GL.Enable(EnableCap.Texture2D);
+            GL.Disable(EnableCap.DepthTest);
+            GL.Color3(1.0f, 1.0f, 1.0f);
+
             // called once per frame; render
             tracer.Tick();
             if (terminated)
@@ -78,6 +80,13 @@ namespace Application
             GL.TexCoord2(0.0f, 0.0f); GL.Vertex2(-1.0f, 1.0f);
             GL.End();
             // tell OpenTK we're done rendering
+
+                        
+            GL.Enable(EnableCap.DepthTest);
+            GL.Disable(EnableCap.Texture2D);
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+            tracer.Render();
+            
             SwapBuffers();
         }
         public static void Main(string[] args)

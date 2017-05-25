@@ -1,22 +1,30 @@
 ﻿using OpenTK;
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
 
 namespace Application
 {
     class Camera
     {
-        Vector3 position, direction;
-        Surface Screenplane;
+        Vector3 position, direction = new Vector3(0,0,1), screenCenter;
+        public Vector3 p0, p1, p2; //screen corners
+        float d = 1; //for FOV adjustment
 
-        public Camera(Vector3 position, Vector3 direction, Surface Screenplane)
+        public Camera(Vector3 position, Vector3 direction)
         {
             this.position = position;
             this.direction = direction;
-            this.Screenplane = Screenplane;         
+
+            //screen plane, adjust FOV by altering d
+            screenCenter = position + (d *direction);
+
+            //corners, transform camera by multiplying E,p0,1,2 with camera matrix
+            p0 = screenCenter + new Vector3(-1, -1, 0); //Only if direction (0,0,1)
+            p1 = screenCenter + new Vector3(1, -1, 0); //Only if direction (0,0,1)
+            p2 = screenCenter + new Vector3(-1, 1, 0); //Only if direction (0,0,1)
+        }
+
+        public Vector3 Position
+        {
+            get { return position; }
         }
 
     }
