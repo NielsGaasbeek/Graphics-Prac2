@@ -30,7 +30,7 @@ namespace Application
             p1 = p1 + new Vector3(0.1f * up, 0.1f * right, 0.1f * away);
             p2 = p2 + new Vector3(0.1f * up, 0.1f * right, 0.1f * away);
         }
-
+        
         public Vector3 Position
         {
             get { return position; }
