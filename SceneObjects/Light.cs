@@ -2,18 +2,14 @@
 
 namespace Application
 {
-    class Light
+    public class Light
     {
-        Vector3 location;
-        float red, blue, green;
+        Vector3 location, color;
 
-        public Light(Vector3 pos, float red, float green, float blue)
+        public Light(Vector3 pos, Vector3 col)
         {
             location = pos;
-
-            this.red = red;
-            this.green = green;
-            this.blue = blue;
+            color = col;
         }
 
     }

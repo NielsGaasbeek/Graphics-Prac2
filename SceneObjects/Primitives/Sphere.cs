@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
-using System.Drawing;
+﻿using OpenTK;
+using System;
 
 namespace Application
 {
@@ -19,5 +14,38 @@ namespace Application
             radius = r;
         }
 
+        public override float Intersection(Ray R)
+        {
+            float a = dotProduct(R.D, R.D);
+            float b = dotProduct(2 * R.D, (R.O - centerPos));
+            float c = dotProduct((R.O - centerPos), (R.O - centerPos)) - radius * radius;
+
+            float D = (float)Math.Sqrt((b*b)-4*a*c);
+            if(D >= 0)
+            {
+                Vector3 C = centerPos - R.O;
+                float t = dotProduct(C, R.D);
+                Vector3 q = C - t * R.D;
+                float p2 = dotProduct(q, q);
+                if (p2 > (radius * radius))
+                {
+                    return 0;
+                }
+                t -= (float)Math.Sqrt((radius * radius) - p2);
+                return t;
+            }
+
+            return 0;
+        }
+
+        public Vector3 CenterPos
+        {
+            get { return centerPos; }
+        }
+
+        public float Radius
+        {
+            get { return radius; }
+        }
     }
 }
