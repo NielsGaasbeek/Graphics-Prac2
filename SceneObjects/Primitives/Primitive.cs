@@ -7,10 +7,12 @@ namespace Application
     class Primitive
     {
         Vector3 primitiveColor;
+        private Vector3 position;
 
-        public Primitive(Vector3 color)
+        public Primitive(Vector3 color, Vector3 pos)
         {
             primitiveColor = color;
+            position = pos;
         }
         
         public virtual float Intersection(Ray R)
@@ -23,6 +25,10 @@ namespace Application
             return A.X * B.X + A.Y * B.Y + A.Z * B.Z;
         }
 
+        public Vector3 Position
+        {
+            get { return position; }
+        }
         public Vector3 Color
         {
             get { return primitiveColor; }
