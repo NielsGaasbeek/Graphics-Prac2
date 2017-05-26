@@ -46,15 +46,24 @@ namespace Application
             if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
             if (keyboard[Key.A])
             {
+                tracer.renderCam.transform(-1, 0, 0);
+                tracer.screen.Clear(0);
+            }
+            if (keyboard[Key.D])
+            {
                 tracer.renderCam.transform(1, 0, 0);
                 tracer.screen.Clear(0);
-            }                
-            if (keyboard[Key.D])
-                tracer.renderCam.transform(-1, 0, 0);
+            }
             if (keyboard[Key.W])
-                tracer.renderCam.transform(0, 1, 0);
-            if (keyboard[Key.S])
+            {
                 tracer.renderCam.transform(0, -1, 0);
+                tracer.screen.Clear(0);
+            }
+            if (keyboard[Key.S])
+            {
+                tracer.renderCam.transform(0, 1, 0);
+                tracer.screen.Clear(0);
+            }
 
         }
         protected override void OnRenderFrame(FrameEventArgs e)
