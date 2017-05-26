@@ -58,6 +58,7 @@ namespace Application
                 Exit();
                 return;
             }
+
             // convert Game.screen to OpenGL texture
             GL.BindTexture(TextureTarget.Texture2D, screenID);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,

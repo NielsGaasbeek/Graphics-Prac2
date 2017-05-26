@@ -18,24 +18,21 @@ namespace Application
         {
             float a = dotProduct(R.D, R.D);
             float b = dotProduct(2 * R.D, (R.O - centerPos));
-            float c = dotProduct((R.O - centerPos), (R.O - centerPos)) - radius * radius;
+            float c = dotProduct((R.O - centerPos), (R.O - centerPos)) - (radius * radius);
 
-            float D = (float)Math.Sqrt((b*b)-4*a*c);
+            float D = (float)Math.Sqrt((b*b)-(4*a*c));
             if(D >= 0)
             {
                 Vector3 C = centerPos - R.O;
                 float t = dotProduct(C, R.D);
                 Vector3 q = C - t * R.D;
                 float p2 = dotProduct(q, q);
-                if (p2 > (radius * radius))
-                {
-                    return 0;
-                }
+                if (p2 > (radius * radius)) { return 0; }
                 t -= (float)Math.Sqrt((radius * radius) - p2);
+                if ((t < R.t) && (t > 0f)) { R.t = t; }
                 return t;
             }
-
-            return 0;
+            else return 500f;
         }
 
         public Vector3 CenterPos

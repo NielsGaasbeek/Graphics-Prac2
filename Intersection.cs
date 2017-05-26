@@ -6,12 +6,14 @@ namespace Application
     {
         //Vector3 intersectNorm;
         float intersectDist;
+        Vector3 intersectPos;
         Primitive intersectObj;
 
-        public Intersection(float t, Primitive P)
+        public Intersection(float t, Primitive P, Vector3 pos)
         {
             intersectDist = t;
             intersectObj = P;
+            intersectPos = pos;
         }
 
         public float Distance
