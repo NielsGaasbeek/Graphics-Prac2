@@ -4,32 +4,26 @@ namespace Application
 {
     class Intersection
     {
-        Vector3 intersectNorm;
+        //Vector3 intersectNorm;
         float intersectDist;
+        Vector3 intersectPos;
         Primitive intersectObj;
 
-        public Intersection(float t, Primitive P)
+        public Intersection(float t, Primitive P, Vector3 pos)
         {
             intersectDist = t;
             intersectObj = P;
+            intersectPos = pos;
         }
 
         public float Distance
         {
             get { return intersectDist; }
-            set { intersectDist = value; }
         }
 
         public Primitive Primitive
-        {
-            get { return intersectObj; }
-            set { intersectObj = value; }
-        }
-
-        public Vector3 Normal
-        {
-            get { return intersectNorm; }
-            set { intersectNorm = value; }
-        }
+        { get { return intersectObj; } }
+        public Vector3 IntersectPosition
+        { get { return intersectPos; } }
     }
 }
