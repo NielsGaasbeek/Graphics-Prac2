@@ -24,8 +24,6 @@ namespace Application
 
         public Camera renderCam;
         public Scene scene;
-        public Sphere Sphere1, Sphere2, Sphere3;
-        Plane Floor;
 
         Ray ray = new Ray();
         Vector3 point = new Vector3(0, 0, 0);
@@ -34,8 +32,6 @@ namespace Application
         float xmin = -5; float xmax = 5;
         float ymin = -1; float ymax = 9;
         float scale;
-
-        float a;
 
         //initialize
         public void Init()
@@ -46,18 +42,7 @@ namespace Application
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
             ray.O = renderCam.Position;
             
-            Light light = new Light(new Vector3(5, 5, 5), new Vector3(1, 1, 1), 10); //add a light to the scene
-            scene.Lights.Add(light);
 
-            Floor = new Plane(new Vector3(0, 1, 0), 0, new Vector3(100, 100, 100)); //gray floor plane
-            Sphere1 = new Sphere(new Vector3(-3, 0, 7), 1, new Vector3(255, 0, 0)); //red sphere
-            Sphere2 = new Sphere(new Vector3(0, 0, 7), 1, new Vector3(0, 255, 0)); //green sphere
-            Sphere3 = new Sphere(new Vector3(3, 0, 7), 1, new Vector3(0, 0, 255)); //blue sphere
-
-            scene.Primitives.Add(Floor); //add the primitives
-            scene.Primitives.Add(Sphere1);
-            scene.Primitives.Add(Sphere2);
-            scene.Primitives.Add(Sphere3);
         }
 
         public void Render()
@@ -123,31 +108,24 @@ namespace Application
 
             //screen plane
             screen.Line(
-                TX(renderCam.p0.X) + 512, 
-                TY(renderCam.p0.Z), 
-                TX(renderCam.p1.X) + 512, 
+                TX(renderCam.p0.X) + 512,
+                TY(renderCam.p0.Z),
+                TX(renderCam.p1.X) + 512,
                 TY(renderCam.p1.Z), 0xffffff);
 
-            //spheres
-            for (int r = 0; r < 360; r++)
+            foreach (Sphere s in scene.Spheres)
             {
-                screen.Plot(
-                    TX((float)(Sphere1.CenterPos.X + Sphere1.Radius * Math.Cos(r))) + 512, 
-                    TY((float)(Sphere1.CenterPos.Z + Sphere1.Radius * Math.Sin(r))), 
-                    CreateColor((int)Sphere1.Color.X, (int)Sphere1.Color.Y, (int)Sphere1.Color.Z));
-
-                screen.Plot(
-                    TX((float)(Sphere2.CenterPos.X + Sphere2.Radius * Math.Cos(r))) + 512, 
-                    TY((float)(Sphere2.CenterPos.Z + Sphere2.Radius * Math.Sin(r))),
-                    CreateColor((int)Sphere2.Color.X, (int)Sphere2.Color.Y, (int)Sphere2.Color.Z));
-
-                screen.Plot(
-                    TX((float)(Sphere3.CenterPos.X + Sphere3.Radius * Math.Cos(r))) + 512, 
-                    TY((float)(Sphere3.CenterPos.Z + Sphere3.Radius * Math.Sin(r))),
-                    CreateColor((int)Sphere3.Color.X, (int)Sphere3.Color.Y, (int)Sphere3.Color.Z));
+                for (float r = 0; r < 10; r += .1f)
+                {
+                    screen.Line(
+                        TX((float)(s.Position.X + s.Radius * Math.Cos(r))) + 512,
+                        TY((float)(s.Position.Z + s.Radius * Math.Sin(r))),
+                        TX((float)(s.Position.X + s.Radius * Math.Cos(r + .1))) + 512,
+                        TY((float)(s.Position.Z + s.Radius * Math.Sin(r + .1))),
+                        CreateColor((int)s.Color.X, (int)s.Color.Y, (int)s.Color.Z)
+                        );
+                }
             }
-
-
         }
 
         public int TX(float x)

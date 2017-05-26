@@ -5,25 +5,23 @@ namespace Application
 {
     class Sphere : Primitive
     {
-        Vector3 centerPos;
         float radius;
 
-        public Sphere(Vector3 pos, float r, Vector3 color) : base(color)
+        public Sphere(Vector3 pos, float r, Vector3 color) : base(color, pos)
         {
-            centerPos = pos;
             radius = r;
         }
 
         public override float Intersection(Ray R)
         {
             float a = dotProduct(R.D, R.D);
-            float b = dotProduct(2 * R.D, (R.O - centerPos));
-            float c = dotProduct((R.O - centerPos), (R.O - centerPos)) - (radius * radius);
+            float b = dotProduct(2 * R.D, (R.O - Position));
+            float c = dotProduct((R.O - Position), (R.O - Position)) - (radius * radius);
 
             float D = (float)Math.Sqrt((b*b)-(4*a*c));
             if(D >= 0)
             {
-                Vector3 C = centerPos - R.O;
+                Vector3 C = Position - R.O;
                 float t = dotProduct(C, R.D);
                 Vector3 q = C - t * R.D;
                 float p2 = dotProduct(q, q);
@@ -32,12 +30,7 @@ namespace Application
                 if ((t < R.t) && (t > 0f)) { R.t = t; }
                 return t;
             }
-            else return 500f;
-        }
-
-        public Vector3 CenterPos
-        {
-            get { return centerPos; }
+            else return 0;
         }
 
         public float Radius

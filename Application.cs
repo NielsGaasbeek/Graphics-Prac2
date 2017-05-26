@@ -43,6 +43,7 @@ namespace Application
             // called once per frame; app logic
             var keyboard = OpenTK.Input.Keyboard.GetState();
             if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
+            if (keyboard[Key.Space]) tracer.Render();
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
@@ -58,6 +59,8 @@ namespace Application
                 Exit();
                 return;
             }
+
+
 
             // convert Game.screen to OpenGL texture
             GL.BindTexture(TextureTarget.Texture2D, screenID);
@@ -86,8 +89,7 @@ namespace Application
             GL.Enable(EnableCap.DepthTest);
             GL.Disable(EnableCap.Texture2D);
             GL.Clear(ClearBufferMask.DepthBufferBit);
-            tracer.Render();
-            
+
             SwapBuffers();
         }
         public static void Main(string[] args)
