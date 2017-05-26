@@ -24,6 +24,7 @@ namespace Application
             Sprite.target = tracer.screen;
             screenID = tracer.screen.GenTexture();
             tracer.Init();
+            tracer.Render();
         }
         protected override void OnUnload(EventArgs e)
         {
@@ -44,6 +45,8 @@ namespace Application
             // called once per frame; app logic
             var keyboard = OpenTK.Input.Keyboard.GetState();
             if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
+
+            if (keyboard[Key.Space]) tracer.Render();
             if (keyboard[Key.A])
             {
                 tracer.renderCam.transform(-1, 0, 0);
@@ -80,6 +83,9 @@ namespace Application
                 Exit();
                 return;
             }
+
+
+
             // convert Game.screen to OpenGL texture
             GL.BindTexture(TextureTarget.Texture2D, screenID);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
@@ -107,8 +113,7 @@ namespace Application
             GL.Enable(EnableCap.DepthTest);
             GL.Disable(EnableCap.Texture2D);
             GL.Clear(ClearBufferMask.DepthBufferBit);
-            tracer.Render();
-            
+
             SwapBuffers();
         }
         public static void Main(string[] args)
