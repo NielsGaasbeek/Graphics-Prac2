@@ -19,6 +19,7 @@ namespace Application
         public Camera renderCam;
         public Scene scene;
         public Sphere Sphere1, Sphere2, Sphere3;
+        Plane Floor;
 
         Ray ray = new Ray();
         Vector3 point = new Vector3(0, 0, 0);
@@ -38,12 +39,11 @@ namespace Application
             scene = new Scene(); //create the scene
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
             ray.O = renderCam.Position;
-            //ray.t = 10;
-
+            
             Light light = new Light(new Vector3(5, 5, 5), new Vector3(1, 1, 1)); //add a light to the scene
             scene.Lights.Add(light);
 
-            Plane Floor = new Plane(new Vector3(0, 0, 0), 0, new Vector3(0.1f, 0.1f, 0.1f)); //gray floor plane
+            Floor = new Plane(new Vector3(0, 1, 0), 0, new Vector3(50, 50, 50)); //gray floor plane
             Sphere1 = new Sphere(new Vector3(-3, 0, 7), 1, new Vector3(255, 0, 0)); //red sphere
             Sphere2 = new Sphere(new Vector3(0, 0, 7), 1, new Vector3(0, 255, 0)); //green sphere
             Sphere3 = new Sphere(new Vector3(3, 0, 7), 1, new Vector3(0, 0, 255)); //blue sphere
@@ -63,32 +63,26 @@ namespace Application
             {
                 for(int y = 0; y < 512; y++)
                 {
-                    float u = (float)(renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * (x + 0.5)) / 512;
-                    float v = (float)(renderCam.p2.Y + (renderCam.p0.Y - renderCam.p2.Y) * (y + 0.5)) / 512;
+                    float u = (float)(renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5) / 512));
+                    float v = (float)(renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5) / 512));
 
-                    Vector3 point = renderCam.p0 + u * (renderCam.p1 - renderCam.p0) + v * (renderCam.p2 - renderCam.p0);
-                    Vector3 dir = point - renderCam.Position;
-                    float normal = (float)Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y + dir.Z * dir.Z);
-                    ray.D = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
+                    ray.D = new Vector3(u, v, 1) - renderCam.Position;
+                    ray.O = renderCam.Position;
 
-                    scene.Intersect(ray);
+                    Intersection intersection = scene.closestIntersect(ray);
 
-                    if(ray.t == 0)
+                    if(intersection.Primitive != null)
                     {
-                        screen.Plot(x, y, 0x000000);
-                    }
-                    else
-                    {
-                        screen.Plot(x, y, 0xffffff);
+                        screen.Plot(x, y, CreateColor((int)intersection.Primitive.Color.X, (int)intersection.Primitive.Color.Y, (int)intersection.Primitive.Color.Z));
                     }
 
-                    if(x % 20 == 0 && y % 20 == 0)
+                    if(y == 256 && x % 5 == 0)
                     {
-                        screen.Line(TX(ray.O.X) + 512, TY(ray.O.Z), TX(ray.O.X + ray.D.X * ray.t) + 512, TY(ray.O.Z + ray.D.Z * ray.t), 0xffff00);
-                    }
-
+                        screen.Line(TX(ray.O.X) + 512, TY(ray.O.Z), TX(ray.O.X + ray.D.X * intersection.Distance) + 512, TY(ray.O.Z + ray.D.Z * intersection.Distance), 0xffff00);
+                    }                    
                 }
             }
+
             GL.End();
         }
 
@@ -116,10 +110,6 @@ namespace Application
 
             screen.Plot(TX((float)(Sphere3.CenterPos.X + Sphere3.Radius * Math.Cos(a))) + 512, TY((float)(Sphere3.CenterPos.Z + Sphere3.Radius * Math.Sin(a))),
                 CreateColor((int)Sphere3.Color.X, (int)Sphere3.Color.Y, (int)Sphere3.Color.Z));
-
-            //rays
-
-
         }
 
         public int TX(float x)

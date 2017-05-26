@@ -13,13 +13,22 @@ namespace Application
 
         }
 
-        public void Intersect(Ray R)
+        public Intersection closestIntersect(Ray R)
         {
-            foreach(Primitive P in sceneObjects)
+            float tMax = int.MaxValue;
+            Primitive hitObject = null;
+
+            foreach (Primitive P in sceneObjects)
             {
-                P.FindIntersection(R);
+                float t = P.Intersection(R);
+                if ( t > 0 && t < tMax)
+                {
+                    tMax = t;
+                    hitObject = P;
+                }
             }
 
+            return new Intersection(tMax, hitObject);
         }
 
         public IList<Light> Lights
