@@ -21,7 +21,8 @@ namespace Application
         public Sphere Sphere1, Sphere2, Sphere3;
         Plane Floor;
 
-        Ray ray = new Ray();
+        Ray PrimRay = new Ray();
+        Ray ShadRay = new Ray();
         Vector3 point = new Vector3(0, 0, 0);
 
         //coordinate system
@@ -38,7 +39,7 @@ namespace Application
 
             scene = new Scene(); //create the scene
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
-            ray.O = renderCam.Position;
+            PrimRay.O = renderCam.Position;
             
             Light light = new Light(new Vector3(5, 5, 5), new Vector3(1, 1, 1)); //add a light to the scene
             scene.Lights.Add(light);
@@ -59,30 +60,34 @@ namespace Application
             GL.Color3(1.0f, 0.0f, 0.0f);
             GL.Begin(PrimitiveType.Triangles);
 
-            for(int x = 0; x < 512; x++)
+            for(int x = 0; x < 512; x++) //dubbele for loop om voor alle pixels in het linker scherm
             {
                 for(int y = 0; y < 512; y++)
                 {
-                    float u = (float)(renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5) / 512));
+                    float u = (float)(renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5) / 512)); //de plek van elke pixel berekenen op de screen plane
                     float v = (float)(renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5) / 512));
 
-                    Vector3 dir = new Vector3(u, v, 1) - renderCam.Position;
-                    float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
-                    Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
+                    Vector3 dir = new Vector3(u, v, 1) - renderCam.Position; //ray richting voor normalisatie
+                    float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z)); //normalisatie
+                    Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal); //genormaliseerde ray richting
 
-                    ray.D = normDir;
-                    ray.O = renderCam.Position;
+                    PrimRay.D = normDir;
+                    PrimRay.O = renderCam.Position;
 
-                    Intersection intersection = scene.closestIntersect(ray);
+                    Intersection intersection = scene.closestIntersect(PrimRay); //vraag dichtstbijzijnde intersect
 
-                    if(intersection.Primitive != null)
+                    //shadow ray
+                    ShadRay.O = new Vector3(0,0,0); //plek waar primRay de primitive raakt
+
+
+                    if(intersection.Primitive != null) //als een primitive geraakt wordt, geef de pixel die kleur
                     {
                         screen.Plot(x, y, CreateColor((int)intersection.Primitive.Color.X, (int)intersection.Primitive.Color.Y, (int)intersection.Primitive.Color.Z));
                     }
 
-                    if(y == 256 && x % 20 == 0)
+                    if(y == 256 && x % 20 == 0) //teken lijnen voor debug view. 
                     {
-                        screen.Line(TX(ray.O.X) + 512, TY(ray.O.Z), TX(ray.O.X + ray.D.X * intersection.Distance) + 512, TY(ray.O.Z + ray.D.Z * intersection.Distance), 0xffff00);
+                        screen.Line(TX(PrimRay.O.X) + 512, TY(PrimRay.O.Z), TX(PrimRay.O.X + PrimRay.D.X * intersection.Distance) + 512, TY(PrimRay.O.Z + PrimRay.D.Z * intersection.Distance), 0xffff00);
                     }                    
                 }
             }
@@ -93,7 +98,7 @@ namespace Application
         // tick: renders one frame
         public void Tick()
         {
-            a += 0.01f;
+            a += 0.05f;
             //screen.Clear(0);
             screen.Line(TX(5), TY(ymax), TX(5), TY(ymin), 0xffffff);
 

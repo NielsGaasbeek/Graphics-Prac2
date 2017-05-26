@@ -4,7 +4,7 @@ namespace Application
 {
     class Intersection
     {
-        //Vector3 intersectNorm;
+        Vector3 intersectNorm;
         float intersectDist;
         Primitive intersectObj;
 
@@ -24,6 +24,12 @@ namespace Application
         {
             get { return intersectObj; }
             set { intersectObj = value; }
+        }
+
+        public Vector3 Normal
+        {
+            get { return intersectNorm; }
+            set { intersectNorm = value; }
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Application
             float b = dotProduct(2 * R.D, (R.O - centerPos));
             float c = dotProduct((R.O - centerPos), (R.O - centerPos)) - radius * radius;
 
-            float D = (float)Math.Sqrt((b*b)-4*a*c);
+            float D = (float)Math.Sqrt((b*b)-4*a*c); //abc-formule, als Discriminant >= 0 is er intersection
             if(D >= 0)
             {
                 Vector3 C = centerPos - R.O;
