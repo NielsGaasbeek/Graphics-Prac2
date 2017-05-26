@@ -4,9 +4,9 @@ namespace Application
 {
     class Camera
     {
-        Vector3 position, direction = new Vector3(0,0,1), screenCenter;
+        Vector3 position, direction, screenCenter;
         public Vector3 p0, p1, p2; //screen corners
-        float d = 1; //for FOV adjustment
+        float d = 1f; //for FOV adjustment
 
         public Camera(Vector3 position, Vector3 direction)
         {
@@ -14,7 +14,7 @@ namespace Application
             this.direction = direction;
 
             //screen plane, adjust FOV by altering d
-            screenCenter = position + (d *direction);
+            screenCenter = position + (d * direction);
 
             //corners, transform camera by multiplying E,p0,1,2 with camera matrix
             p0 = screenCenter + new Vector3(-1, -1, 0); //Only if direction (0,0,1)
@@ -26,6 +26,5 @@ namespace Application
         {
             get { return position; }
         }
-
     }
 }

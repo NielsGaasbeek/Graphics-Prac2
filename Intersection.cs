@@ -17,11 +17,13 @@ namespace Application
         public float Distance
         {
             get { return intersectDist; }
+            set { intersectDist = value; }
         }
 
         public Primitive Primitive
         {
             get { return intersectObj; }
+            set { intersectObj = value; }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using OpenTK;
-using System.Collections.Generic;
+using OpenTK.Graphics.OpenGL;
+using System;
 
 namespace Application
 {
@@ -11,10 +12,10 @@ namespace Application
         {
             primitiveColor = color;
         }
-
-        public virtual float FindIntersection(Ray R)
+        
+        public virtual float Intersection(Ray R)
         {
-            return -1;
+            return 0;
         }
 
         public float dotProduct(Vector3 A, Vector3 B)
