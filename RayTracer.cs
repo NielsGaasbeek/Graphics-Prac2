@@ -72,18 +72,29 @@ namespace Application
                         Ray shadowRay = new Ray();
                         foreach (Light l in scene.Lights)
                         {
-                            shadowRay.O = l.Position;
+                            float eps = .001f;
+
                             shadowRay.D = (intersection.IntersectPosition - l.Position);
+                            shadowRay.O = l.Position;
                             shadowRay.Normalize();
+                            float intersectDist = CalcDistance(shadowRay.O, intersection.IntersectPosition);
+
                             Intersection lightIntersect = scene.closestIntersect(shadowRay);
-                            if (lightIntersect.Primitive == intersection.Primitive)
+
+                            if ((int)(lightIntersect.Distance) == (int)intersectDist)
                             {
+                                float distAttenuation = l.Intensity / (intersectDist * intersectDist);
+                                float NdotL = dotProduct(intersection.Primitive.NormalVector(intersection.IntersectPosition), shadowRay.D);
+                                if (NdotL < 0 || distAttenuation < .05f) continue;
+                                Vector3 color = intersection.Primitive.Color * distAttenuation * NdotL;
+
                                 screen.Plot(
                                     x, y, 
                                     CreateColor(
-                                        (int)intersection.Primitive.Color.X, 
-                                        (int)intersection.Primitive.Color.Y, 
-                                        (int)intersection.Primitive.Color.Z));
+                                        (int)color.X, 
+                                        (int)color.Y, 
+                                        (int)color.Z)
+                                        );
                             }
 
 
@@ -157,7 +168,24 @@ namespace Application
 
         int CreateColor(int red, int green, int blue)
         {
+            if (red > 255) red = 255;
+            if (green > 255) green = 255;
+            if (blue > 255) blue = 255;
             return (red << 16) + (green << 8) + blue;
+        }
+
+        float CalcDistance(Vector3 pos1, Vector3 pos2)
+        {
+            return (float)Math.Sqrt(
+                (pos1.X - pos2.X) * (pos1.X - pos2.X) +
+                (pos1.Y - pos2.Y) * (pos1.Y - pos2.Y) +
+                (pos1.Z - pos2.Z) * (pos1.Z - pos2.Z)
+                );
+        }
+
+        public float dotProduct(Vector3 A, Vector3 B)
+        {
+            return A.X * B.X + A.Y * B.Y + A.Z * B.Z;
         }
     }
 }

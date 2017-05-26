@@ -57,7 +57,7 @@ namespace Application
 
         public void FillScene()
         {
-            Light light = new Light(new Vector3(0, 0, 10), new Vector3(1, 1, 1), 1); //add a light to the scene
+            Light light = new Light(new Vector3(0, -2, 5), new Vector3(1, 1, 1), 10); //add a light to the scene
             Lights.Add(light);
 
             Floor = new Plane(new Vector3(0, 1, 0), -1, new Vector3(100, 100, 100)); //gray floor plane
