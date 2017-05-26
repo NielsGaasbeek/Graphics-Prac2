@@ -43,7 +43,7 @@ namespace Application
             Light light = new Light(new Vector3(5, 5, 5), new Vector3(1, 1, 1)); //add a light to the scene
             scene.Lights.Add(light);
 
-            Floor = new Plane(new Vector3(0, 1, 0), 0, new Vector3(50, 50, 50)); //gray floor plane
+            Floor = new Plane(new Vector3(0, 1, 0), 0, new Vector3(100, 100, 100)); //gray floor plane
             Sphere1 = new Sphere(new Vector3(-3, 0, 7), 1, new Vector3(255, 0, 0)); //red sphere
             Sphere2 = new Sphere(new Vector3(0, 0, 7), 1, new Vector3(0, 255, 0)); //green sphere
             Sphere3 = new Sphere(new Vector3(3, 0, 7), 1, new Vector3(0, 0, 255)); //blue sphere
@@ -66,7 +66,11 @@ namespace Application
                     float u = (float)(renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5) / 512));
                     float v = (float)(renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5) / 512));
 
-                    ray.D = new Vector3(u, v, 1) - renderCam.Position;
+                    Vector3 dir = new Vector3(u, v, 1) - renderCam.Position;
+                    float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
+                    Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
+
+                    ray.D = normDir;
                     ray.O = renderCam.Position;
 
                     Intersection intersection = scene.closestIntersect(ray);
@@ -76,7 +80,7 @@ namespace Application
                         screen.Plot(x, y, CreateColor((int)intersection.Primitive.Color.X, (int)intersection.Primitive.Color.Y, (int)intersection.Primitive.Color.Z));
                     }
 
-                    if(y == 256 && x % 5 == 0)
+                    if(y == 256 && x % 20 == 0)
                     {
                         screen.Line(TX(ray.O.X) + 512, TY(ray.O.Z), TX(ray.O.X + ray.D.X * intersection.Distance) + 512, TY(ray.O.Z + ray.D.Z * intersection.Distance), 0xffff00);
                     }                    
