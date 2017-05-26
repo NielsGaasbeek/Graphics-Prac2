@@ -45,9 +45,8 @@ namespace Application
             // called once per frame; app logic
             var keyboard = OpenTK.Input.Keyboard.GetState();
             if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
-<<<<<<< HEAD
+
             if (keyboard[Key.Space]) tracer.Render();
-=======
             if (keyboard[Key.A])
             {
                 tracer.renderCam.transform(-1, 0, 0);
@@ -69,7 +68,6 @@ namespace Application
                 tracer.screen.Clear(0);
             }
 
->>>>>>> refs/remotes/origin/master
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
