@@ -23,6 +23,7 @@ namespace Application
             Sprite.target = tracer.screen;
             screenID = tracer.screen.GenTexture();
             tracer.Init();
+            tracer.Render();
         }
         protected override void OnUnload(EventArgs e)
         {

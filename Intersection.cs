@@ -19,13 +19,11 @@ namespace Application
         public float Distance
         {
             get { return intersectDist; }
-            set { intersectDist = value; }
         }
 
         public Primitive Primitive
-        {
-            get { return intersectObj; }
-            set { intersectObj = value; }
-        }
+        { get { return intersectObj; } }
+        public Vector3 IntersectPosition
+        { get { return intersectPos; } }
     }
 }

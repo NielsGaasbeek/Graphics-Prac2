@@ -57,11 +57,11 @@ namespace Application
 
         public void FillScene()
         {
-            Light light = new Light(new Vector3(5, 5, 5), new Vector3(1, 1, 1), 10); //add a light to the scene
+            Light light = new Light(new Vector3(0, 0, 10), new Vector3(1, 1, 1), 1); //add a light to the scene
             Lights.Add(light);
 
             Floor = new Plane(new Vector3(0, 1, 0), -1, new Vector3(100, 100, 100)); //gray floor plane
-            Sphere1 = new Sphere(new Vector3(-3, 0, 7), 1, new Vector3(255, 100, 0)); //red sphere
+            Sphere1 = new Sphere(new Vector3(-3, 0, 7), 1, new Vector3(255, 0, 0)); //red sphere
             Sphere2 = new Sphere(new Vector3(0, 0, 7), 1, new Vector3(0, 255, 0)); //green sphere
             Sphere3 = new Sphere(new Vector3(3, 0, 7), 1, new Vector3(0, 0, 255)); //blue sphere
 

@@ -4,15 +4,20 @@ namespace Application
 {
     public class Light
     {
-        Vector3 location, color;
+        Vector3 position, color;
         int intensity;
 
         public Light(Vector3 pos, Vector3 col, int intensity)
         {
-            location = pos;
+            position = pos;
             color = col;
             this.intensity = intensity;
         }
+
+        public Vector3 Position
+        { get { return position; } }
+        public int Intensity
+        { get { return intensity; } }
 
     }
 }

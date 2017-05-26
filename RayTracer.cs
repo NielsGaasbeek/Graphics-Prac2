@@ -10,10 +10,10 @@ namespace Application
         public Vector3 D; //Direction
         public float t; //distance
 
-        public void Normalize(Ray r)
+        public void Normalize()
         {
             float normFactor = (float)Math.Sqrt((D.X * D.X) + (D.Y * D.Y) + (D.Z * D.Z));
-            D = new Vector3(r.D.X / normFactor, r.D.Y / normFactor, r.D.Z / normFactor);
+            D = new Vector3(D.X / normFactor, D.Y / normFactor, D.Z / normFactor);
         }
     }
 
@@ -69,15 +69,25 @@ namespace Application
                     if(intersection.Primitive != null)
                     {
                         //here the shadowrays should be fired
+                        Ray shadowRay = new Ray();
+                        foreach (Light l in scene.Lights)
+                        {
+                            shadowRay.O = l.Position;
+                            shadowRay.D = (intersection.IntersectPosition - l.Position);
+                            shadowRay.Normalize();
+                            Intersection lightIntersect = scene.closestIntersect(shadowRay);
+                            if (lightIntersect.Primitive == intersection.Primitive)
+                            {
+                                screen.Plot(
+                                    x, y, 
+                                    CreateColor(
+                                        (int)intersection.Primitive.Color.X, 
+                                        (int)intersection.Primitive.Color.Y, 
+                                        (int)intersection.Primitive.Color.Z));
+                            }
 
-                        screen.Plot(
-                            x, y, 
-                            CreateColor(
-                                (int)intersection.Primitive.Color.X, 
-                                (int)intersection.Primitive.Color.Y, 
-                                (int)intersection.Primitive.Color.Z
-                                        )
-                                    );
+
+                        }
                     }
 
                     if(y == 256 && x % 30 == 0)
@@ -126,6 +136,7 @@ namespace Application
                         );
                 }
             }
+
         }
 
         public int TX(float x)
