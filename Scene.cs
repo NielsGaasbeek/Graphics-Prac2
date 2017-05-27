@@ -66,7 +66,7 @@ namespace Application
 
             Floor = new Plane(new Vector3(0, 1, 0), -1, new Vector3(10, 10, 10), "Diffuse"); //gray floor plane
             Sphere1 = new Sphere(new Vector3(-3, 0, 3), 1, new Vector3(255, 0, 0), "Diffuse"); //left sphere
-            Sphere2 = new Sphere(new Vector3(0, 0, 4), 1, new Vector3(255, 255, 255), "Diffuse"); //middle sphere
+            Sphere2 = new Sphere(new Vector3(0, 0, 4), 1, new Vector3(255, 255, 255), "Mirror"); //middle sphere
             Sphere3 = new Sphere(new Vector3(3, 0, 4), 1, new Vector3(0, 0, 255), "Diffuse"); //right sphere
 
             sceneObjects.Add(Floor); //add the primitives

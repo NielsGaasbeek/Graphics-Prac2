@@ -59,14 +59,30 @@ namespace Application
             }
             if (keyboard[Key.W])
             {
-                tracer.renderCam.transform(0, -1, 0);
+                tracer.renderCam.transform(0, 0, 1);
                 tracer.screen.Clear(0);
             }
             if (keyboard[Key.S])
             {
+                tracer.renderCam.transform(0, 0, -1);
+                tracer.screen.Clear(0);
+            }
+            if (keyboard[Key.Right])
+            {
+                //tracer.renderCam.rotate();
+                //tracer.screen.Clear(0);
+            }
+            if (keyboard[Key.ControlLeft])
+            {
                 tracer.renderCam.transform(0, 1, 0);
                 tracer.screen.Clear(0);
             }
+            if (keyboard[Key.ShiftLeft])
+            {
+                tracer.renderCam.transform(0, -1, 0);
+                tracer.screen.Clear(0);
+            }
+
 
         }
         protected override void OnRenderFrame(FrameEventArgs e)
