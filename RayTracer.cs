@@ -43,8 +43,7 @@ namespace Application
             scene = new Scene(); //create the scene
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
             ray.O = renderCam.Position;
-<<<<<<< HEAD
-=======
+
 
             floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
             for (int x = 0; x < 128; x++)
@@ -56,7 +55,7 @@ namespace Application
                     floorTexColors[x, y] = f;
                 }
             }
->>>>>>> refs/remotes/origin/master
+
         }
 
         public void Render()
@@ -70,13 +69,6 @@ namespace Application
                 {
                     float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f) / 512));
                     float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f) / 512));
-<<<<<<< HEAD
-=======
-
-                    Vector3 dir = new Vector3(u, v, 1) - renderCam.Position;
-                    float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
-                    Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
->>>>>>> refs/remotes/origin/master
 
                     ray.D = new Vector3(u, v, 1) - renderCam.Position;
                     ray.O = renderCam.Position;
@@ -88,7 +80,6 @@ namespace Application
                     if (I.Primitive != null)
                         color = Trace(ray, 0);
 
-<<<<<<< HEAD
                     screen.Plot(
                         x, y,
                         CreateColor(
@@ -98,45 +89,7 @@ namespace Application
 
                     if (y == 256 && x % 10 == 0)
                         DrawDebugRay(ray, I);
-=======
-                    Intersection intersection = scene.closestIntersect(ray);
 
-                    if (intersection.Primitive != null)
-                    {
-                        //here the shadowrays should be fired
-                        Ray shadowRay = new Ray();
-                        foreach (Light l in scene.Lights)
-                        {
-                            shadowRay.D = (intersection.IntersectPosition - l.Position);
-                            shadowRay.O = l.Position;
-                            shadowRay.Normalize();
-                            float intersectDist = CalcDistance(shadowRay.O, intersection.IntersectPosition);
-
-                            Intersection lightIntersect = scene.closestIntersect(shadowRay);
-
-                            if ((int)(lightIntersect.Distance) == (int)intersectDist)
-                            {
-                                float distAttenuation = l.Intensity / (intersectDist * intersectDist);
-                                float NdotL = dotProduct(intersection.Primitive.NormalVector(intersection.IntersectPosition), shadowRay.D);
-                                if (NdotL < 0 || distAttenuation < .05f) continue;
-
-                                Vector3 color = intersection.Primitive.Color * distAttenuation * NdotL;
-
-                                if (intersection.Primitive is Plane) //de enigste plane is de vloer. als er meer planes zijn moet het anders of elke plane krijgt dezelfde texture
-                                {
-                                    color = shadePoint(intersection.IntersectPosition, floorTex) * distAttenuation * NdotL;
-                                }
-
-                                screen.Plot(x, y, CreateColor((int)color.X, (int)color.Y, (int)color.Z));
-                            }
-                        }
-                    }
-
-                    if (y == 256 && x % 30 == 0)
-                    {
-                        screen.Line(TX(ray.O.X) + 512, TY(ray.O.Z), TX(ray.O.X + ray.D.X * intersection.Distance) + 512, TY(ray.O.Z + ray.D.Z * intersection.Distance), 0xffff00);
-                    }
->>>>>>> refs/remotes/origin/master
                 }
             }
 
@@ -148,14 +101,20 @@ namespace Application
             Intersection I = scene.closestIntersect(ray);
             if (I.Primitive == null) return new Vector3(0, 0, 0);
 
+            Vector3 primColor = I.Primitive.PrimitiveColor;
+
+
             if (I.Primitive.PrimitiveMaterial == "Mirror")
             {
                 if (recur < 16)
-                    return I.Primitive.PrimitiveColor * Trace(Reflect(ray, I), recur++);
+                    return primColor * Trace(Reflect(ray, I), recur++);
                 return new Vector3(0, 0, 0);
             }
-            else
-                return DirectIllumination(I) * I.Primitive.PrimitiveColor;
+
+            if (I.Primitive is Plane) //de enige plane is de vloer. als er meer planes zijn moet het anders of elke plane krijgt dezelfde texture
+                primColor = shadePoint(I.IntersectPosition, floorTex);
+
+            return DirectIllumination(I) * primColor;
 
         }
         
@@ -196,14 +155,11 @@ namespace Application
 
         public bool IsVisible(Intersection I, Ray L, float intersectDist)
         {
-            foreach (Light l in scene.Lights)
-            {
-                Intersection lightIntersect = scene.closestIntersect(L);
+            Intersection lightIntersect = scene.closestIntersect(L);
 
-                if ((int)(lightIntersect.Distance * 100) == (int)(intersectDist * 100))
-                    return true;
-                else continue;
-            }
+            if ((int)(lightIntersect.Distance * 10) == (int)(intersectDist * 10))
+                return true;
+
             return false;
         }
 
@@ -225,7 +181,6 @@ namespace Application
             {
                 for (float r = 0; r < 10; r += .1f)
                 {
-<<<<<<< HEAD
                     screen.Line(
                         TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r))) + 512,
                         TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r))),
@@ -233,11 +188,6 @@ namespace Application
                         TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r + .1))),
                         CreateColor((int)s.PrimitiveColor.X, (int)s.PrimitiveColor.Y, (int)s.PrimitiveColor.Z)
                         );
-=======
-                    screen.Line(TX((float)(s.Position.X + s.Radius * Math.Cos(r))) + 512, TY((float)(s.Position.Z + s.Radius * Math.Sin(r))),
-                        TX((float)(s.Position.X + s.Radius * Math.Cos(r + .1))) + 512, TY((float)(s.Position.Z + s.Radius * Math.Sin(r + .1))),
-                        CreateColor((int)s.Color.X, (int)s.Color.Y, (int)s.Color.Z));
->>>>>>> refs/remotes/origin/master
                 }
             }
         }
@@ -295,11 +245,7 @@ namespace Application
 
         float Length(Vector3 vec)
         {
-<<<<<<< HEAD
             return (float)Math.Sqrt((vec.X * vec.X) + (vec.Y * vec.Y) + (vec.Z * vec.Z));
-=======
-            return (float)Math.Sqrt((pos1.X - pos2.X) * (pos1.X - pos2.X) + (pos1.Y - pos2.Y) * (pos1.Y - pos2.Y) + (pos1.Z - pos2.Z) * (pos1.Z - pos2.Z));
->>>>>>> refs/remotes/origin/master
         }
 
         public float dotProduct(Vector3 A, Vector3 B)
