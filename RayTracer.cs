@@ -44,6 +44,7 @@ namespace Application
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
             ray.O = renderCam.Position;
 
+
             floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
             for (int x = 0; x < 128; x++)
             {
@@ -54,6 +55,7 @@ namespace Application
                     floorTexColors[x, y] = f;
                 }
             }
+
         }
 
         public void Render()
@@ -68,6 +70,7 @@ namespace Application
                     float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f) / 512));
                     float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f) / 512));
 
+<<<<<<< HEAD
                     float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
 
                     Vector3 dir = new Vector3(u, v, w) - renderCam.Position; //die w was eerst 1
@@ -77,49 +80,99 @@ namespace Application
                     Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
 
                     ray.D = normDir;
+=======
+                    ray.D = new Vector3(u, v, 1) - renderCam.Position;
+>>>>>>> refs/remotes/origin/master
                     ray.O = renderCam.Position;
+                    ray.Normalize();
 
-                    Intersection intersection = scene.closestIntersect(ray);
+                    Vector3 color = new Vector3(0, 0, 0);
 
-                    if (intersection.Primitive != null)
-                    {
-                        //here the shadowrays should be fired
-                        Ray shadowRay = new Ray();
-                        foreach (Light l in scene.Lights)
-                        {
-                            shadowRay.D = (intersection.IntersectPosition - l.Position);
-                            shadowRay.O = l.Position;
-                            shadowRay.Normalize();
-                            float intersectDist = CalcDistance(shadowRay.O, intersection.IntersectPosition);
+                    Intersection I = scene.closestIntersect(ray);
+                    if (I.Primitive != null)
+                        color = Trace(ray, 0);
 
-                            Intersection lightIntersect = scene.closestIntersect(shadowRay);
+                    screen.Plot(
+                        x, y,
+                        CreateColor(
+                            (int)color.X,
+                            (int)color.Y,
+                            (int)color.Z));
 
-                            if ((int)(lightIntersect.Distance) == (int)intersectDist)
-                            {
-                                float distAttenuation = l.Intensity / (intersectDist * intersectDist);
-                                float NdotL = dotProduct(intersection.Primitive.NormalVector(intersection.IntersectPosition), shadowRay.D);
-                                if (NdotL < 0 || distAttenuation < .05f) continue;
+                    if (y == 256 && x % 10 == 0)
+                        DrawDebugRay(ray, I);
 
-                                Vector3 color = intersection.Primitive.Color * distAttenuation * NdotL;
-
-                                if (intersection.Primitive is Plane) //de enigste plane is de vloer. als er meer planes zijn moet het anders of elke plane krijgt dezelfde texture
-                                {
-                                    color = shadePoint(intersection.IntersectPosition, floorTex) * distAttenuation * NdotL;
-                                }
-
-                                screen.Plot(x, y, CreateColor((int)color.X, (int)color.Y, (int)color.Z));
-                            }
-                        }
-                    }
-
-                    if (y == 256 && x % 30 == 0)
-                    {
-                        screen.Line(TX(ray.O.X) + 512, TY(ray.O.Z), TX(ray.O.X + ray.D.X * intersection.Distance) + 512, TY(ray.O.Z + ray.D.Z * intersection.Distance), 0xffff00);
-                    }
                 }
             }
 
             GL.End();
+        }
+
+        public Vector3 Trace(Ray ray, int recur)
+        {
+            Intersection I = scene.closestIntersect(ray);
+            if (I.Primitive == null) return new Vector3(0, 0, 0);
+
+            Vector3 primColor = I.Primitive.PrimitiveColor;
+
+
+            if (I.Primitive.PrimitiveMaterial == "Mirror")
+            {
+                if (recur < 16)
+                    return primColor * Trace(Reflect(ray, I), recur++);
+                return new Vector3(0, 0, 0);
+            }
+
+            if (I.Primitive is Plane) //de enige plane is de vloer. als er meer planes zijn moet het anders of elke plane krijgt dezelfde texture
+                primColor = shadePoint(I.IntersectPosition, floorTex);
+
+            return DirectIllumination(I) * primColor;
+
+        }
+        
+        public Ray Reflect(Ray ray, Intersection I)
+        {
+            Ray reflectRay = new Ray();
+            Vector3 surfaceNormal = I.NormalVector;
+
+            reflectRay.D = ray.D - ((2 * surfaceNormal) * (dotProduct(ray.D, surfaceNormal)));
+            reflectRay.O = I.IntersectPosition;
+
+            return reflectRay;
+        }
+        
+        public Vector3 DirectIllumination(Intersection I)
+        {
+            Ray shadowRay = new Ray();
+            Vector3 color = new Vector3(0, 0, 0);
+
+            foreach (Light l in scene.Lights)
+            {
+                shadowRay.D = (I.IntersectPosition - l.Position);
+                shadowRay.O = l.Position;
+                float intersectDist = Length(shadowRay.D);
+                shadowRay.Normalize();
+
+                if (!IsVisible(I, shadowRay, intersectDist)) continue;
+
+                float distAttenuation = l.Intensity / (intersectDist * intersectDist);
+                float NdotL = dotProduct(I.NormalVector, shadowRay.D);
+                if (NdotL < 0) continue;
+                color += l.Color * distAttenuation * NdotL;
+                continue;
+            }
+
+            return color;
+        }
+
+        public bool IsVisible(Intersection I, Ray L, float intersectDist)
+        {
+            Intersection lightIntersect = scene.closestIntersect(L);
+
+            if ((int)(lightIntersect.Distance * 10) == (int)(intersectDist * 10))
+                return true;
+
+            return false;
         }
 
         // tick: renders one frame
@@ -140,11 +193,42 @@ namespace Application
             {
                 for (float r = 0; r < 10; r += .1f)
                 {
-                    screen.Line(TX((float)(s.Position.X + s.Radius * Math.Cos(r))) + 512, TY((float)(s.Position.Z + s.Radius * Math.Sin(r))),
-                        TX((float)(s.Position.X + s.Radius * Math.Cos(r + .1))) + 512, TY((float)(s.Position.Z + s.Radius * Math.Sin(r + .1))),
-                        CreateColor((int)s.Color.X, (int)s.Color.Y, (int)s.Color.Z));
+                    screen.Line(
+                        TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r))) + 512,
+                        TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r))),
+                        TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r + .1))) + 512,
+                        TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r + .1))),
+                        CreateColor((int)s.PrimitiveColor.X, (int)s.PrimitiveColor.Y, (int)s.PrimitiveColor.Z)
+                        );
                 }
             }
+        }
+
+        public void DrawDebugRay(Ray ray, Intersection I)
+        {
+            //draws the primary ray in debug
+            screen.Line(
+                    TX(ray.O.X) + 512,
+                    TY(ray.O.Z),
+                    TX(ray.O.X + ray.D.X * I.Distance) + 512,
+                    TY(ray.O.Z + ray.D.Z * I.Distance),
+                    0xffff00
+                        );
+
+            //draws reflective rays
+            if (I.Primitive.PrimitiveMaterial == "Mirror")
+            {
+                Ray reflectRay = Reflect(ray, I);
+                I = scene.closestIntersect(reflectRay);
+
+                screen.Line(
+                    TX(reflectRay.O.X) + 512,
+                    TY(reflectRay.O.Z),
+                    TX(reflectRay.O.X + reflectRay.D.X * I.Distance) + 512,
+                    TY(reflectRay.O.Z + reflectRay.D.Z * I.Distance),
+                    0xffffff);
+            }
+
         }
 
         public int TX(float x)
@@ -171,14 +255,14 @@ namespace Application
             return (red << 16) + (green << 8) + blue;
         }
 
-        float CalcDistance(Vector3 pos1, Vector3 pos2)
+        float Length(Vector3 vec)
         {
-            return (float)Math.Sqrt((pos1.X - pos2.X) * (pos1.X - pos2.X) + (pos1.Y - pos2.Y) * (pos1.Y - pos2.Y) + (pos1.Z - pos2.Z) * (pos1.Z - pos2.Z));
+            return (float)Math.Sqrt((vec.X * vec.X) + (vec.Y * vec.Y) + (vec.Z * vec.Z));
         }
 
         public float dotProduct(Vector3 A, Vector3 B)
         {
-            return A.X * B.X + A.Y * B.Y + A.Z * B.Z;
+            return ((A.X * B.X) + (A.Y * B.Y) + (A.Z * B.Z));
         }
 
         public Vector3 shadePoint(Vector3 P, Surface T) //volgens het boek, maar ik geloof niet dat dit helemaal nodig is
