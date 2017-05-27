@@ -7,7 +7,7 @@ namespace Application
         Vector3 normalVector;
         float distance;
 
-        public Plane(Vector3 norm, float d, Vector3 color, string mat) : base(color, new Vector3(0,0,0), mat)
+        public Plane(string ID, Vector3 norm, float d, Vector3 color, string mat) : base(ID, color, new Vector3(0,0,0), mat)
         {
             normalVector = norm;
             distance = d;

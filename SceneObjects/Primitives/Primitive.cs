@@ -10,14 +10,16 @@ namespace Application
     {
         Vector3 primitiveColor;
         private Vector3 position;
-        string material;
+        Material material;
+        string ID;
 
 
-        public Primitive(Vector3 color, Vector3 pos, string mat)
+        public Primitive(string ID, Vector3 color, Vector3 pos, string mat)
         {
+            this.ID = ID;
             primitiveColor = color;
             position = pos;
-            material = mat;
+            material = new Material(mat);
         }
         
         public virtual float Intersection(Ray R)
@@ -35,12 +37,13 @@ namespace Application
             return A.X * B.X + A.Y * B.Y + A.Z * B.Z;
         }
 
-
+        public string PrimitiveID
+        { get { return ID; } }
         public Vector3 PrimitivePosition
         { get { return position; } }
         public Vector3 PrimitiveColor
         { get { return primitiveColor; } }
-        public string PrimitiveMaterial
+        public Material PrimitiveMaterial
         { get { return material; } }
     }
 }

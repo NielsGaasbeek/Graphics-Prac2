@@ -74,7 +74,7 @@ namespace Application
                     ray.O = renderCam.Position;
                     ray.Normalize();
 
-                    Vector3 color = new Vector3(0, 0, 0);
+                    Vector3 color = new Vector3(1, 1, 1);
 
                     Intersection I = scene.closestIntersect(ray);
                     if (I.Primitive != null)
@@ -87,28 +87,44 @@ namespace Application
                             (int)color.Y,
                             (int)color.Z));
 
-                    if (y == 256 && x % 10 == 0)
-                        DrawDebugRay(ray, I);
-
+                    if (y == 256 && x % 30 == 0)
+                        DrawDebugRay(ray, I, 0xffff00);
                 }
             }
-
             GL.End();
         }
 
         public Vector3 Trace(Ray ray, int recur)
         {
             Intersection I = scene.closestIntersect(ray);
-            if (I.Primitive == null) return new Vector3(0, 0, 0);
+            if (I.Primitive == null) return new Vector3(1, 1, 1);
 
             Vector3 primColor = I.Primitive.PrimitiveColor;
 
 
-            if (I.Primitive.PrimitiveMaterial == "Mirror")
+            if (I.Primitive.PrimitiveMaterial.isMirror)
             {
                 if (recur < 16)
                     return primColor * Trace(Reflect(ray, I), recur++);
-                return new Vector3(0, 0, 0);
+                return new Vector3(1, 1, 1);
+            }
+            else if (I.Primitive.PrimitiveMaterial.isDiElectric)
+            {
+
+            }
+            else if (I.Primitive.PrimitiveMaterial.isSpecular)
+            {
+                Vector3 shadingCol = DirectIllumination(I);
+                Vector3 reflectCol = Trace(Reflect(ray, I), recur++);
+                reflectCol /= 255;
+
+                shadingCol *= .5f;
+                reflectCol *= .5f;
+
+                if (I.Primitive is Plane) //de enige plane is de vloer. als er meer planes zijn moet het anders of elke plane krijgt dezelfde texture
+                    primColor = shadePoint(I.IntersectPosition, floorTex);
+
+                return primColor * (shadingCol + reflectCol);
             }
 
             if (I.Primitive is Plane) //de enige plane is de vloer. als er meer planes zijn moet het anders of elke plane krijgt dezelfde texture
@@ -140,6 +156,7 @@ namespace Application
                 shadowRay.O = l.Position;
                 float intersectDist = Length(shadowRay.D);
                 shadowRay.Normalize();
+
 
                 if (!IsVisible(I, shadowRay, intersectDist)) continue;
 
@@ -192,7 +209,7 @@ namespace Application
             }
         }
 
-        public void DrawDebugRay(Ray ray, Intersection I)
+        public void DrawDebugRay(Ray ray, Intersection I, int color)
         {
             //draws the primary ray in debug
             screen.Line(
@@ -200,23 +217,17 @@ namespace Application
                     TY(ray.O.Z),
                     TX(ray.O.X + ray.D.X * I.Distance) + 512,
                     TY(ray.O.Z + ray.D.Z * I.Distance),
-                    0xffff00
+                    color
                         );
 
             //draws reflective rays
-            if (I.Primitive.PrimitiveMaterial == "Mirror")
+            if (I.Primitive.PrimitiveMaterial.isMirror)
             {
                 Ray reflectRay = Reflect(ray, I);
                 I = scene.closestIntersect(reflectRay);
 
-                screen.Line(
-                    TX(reflectRay.O.X) + 512,
-                    TY(reflectRay.O.Z),
-                    TX(reflectRay.O.X + reflectRay.D.X * I.Distance) + 512,
-                    TY(reflectRay.O.Z + reflectRay.D.Z * I.Distance),
-                    0xffffff);
+                DrawDebugRay(reflectRay, I, 0xffffff);
             }
-
         }
 
         public int TX(float x)

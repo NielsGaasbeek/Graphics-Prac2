@@ -7,7 +7,7 @@ namespace Application
     {
         float radius;
 
-        public Sphere(Vector3 pos, float r, Vector3 color, string mat) : base(color, pos, mat)
+        public Sphere(string ID, Vector3 pos, float r, Vector3 color, string mat) : base(ID, color, pos, mat)
         {
             radius = r;
         }
