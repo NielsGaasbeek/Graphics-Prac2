@@ -15,11 +15,21 @@ namespace Application
         }
 
         public Vector3 Position
+<<<<<<< HEAD
         { get { return position; } }
         public Vector3 Color
         { get { return color; } }
         public int Intensity
         { get { return intensity; } }
+=======
+        {
+            get { return position; }
+        }
+>>>>>>> refs/remotes/origin/master
 
+        public int Intensity
+        {
+            get { return intensity; }
+        }
     }
 }
