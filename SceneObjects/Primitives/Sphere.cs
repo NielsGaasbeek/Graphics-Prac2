@@ -7,7 +7,7 @@ namespace Application
     {
         float radius;
 
-        public Sphere(Vector3 pos, float r, Vector3 color) : base(color, pos)
+        public Sphere(Vector3 pos, float r, Vector3 color, string mat) : base(color, pos, mat)
         {
             radius = r;
         }
@@ -15,13 +15,13 @@ namespace Application
         public override float Intersection(Ray R)
         {
             float a = dotProduct(R.D, R.D);
-            float b = dotProduct(2 * R.D, (R.O - Position));
-            float c = dotProduct((R.O - Position), (R.O - Position)) - (radius * radius);
+            float b = dotProduct(2 * R.D, (R.O - PrimitivePosition));
+            float c = dotProduct((R.O - PrimitivePosition), (R.O - PrimitivePosition)) - (radius * radius);
 
             float D = (float)Math.Sqrt((b*b)-(4*a*c));
             if(D >= 0)
             {
-                Vector3 C = Position - R.O;
+                Vector3 C = PrimitivePosition - R.O;
                 float t = dotProduct(C, R.D);
                 Vector3 q = C - t * R.D;
                 float p2 = dotProduct(q, q);
@@ -35,7 +35,7 @@ namespace Application
 
         public override Vector3 NormalVector(Vector3 pos)
         {
-            return (Position - pos).Normalized();
+            return (PrimitivePosition - pos).Normalized();
         }
 
         public float Radius
