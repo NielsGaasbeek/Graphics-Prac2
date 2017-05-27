@@ -230,13 +230,24 @@ namespace Application
                     color
                         );
 
-            //draws reflective rays
-            if (I.Primitive.PrimitiveMaterial.isMirror)
+            if (I.Primitive != null)
             {
-                Ray reflectRay = Reflect(ray, I);
-                I = scene.closestIntersect(reflectRay);
+                //draws reflective rays
+                if (I.Primitive.PrimitiveMaterial.isMirror)
+                {
+                    Ray reflectRay = Reflect(ray, I);
+                    I = scene.closestIntersect(reflectRay);
 
-                DrawDebugRay(reflectRay, I, 0xffffff);
+                    DrawDebugRay(reflectRay, I, 0x5f5f5f);
+                }
+
+                else if (I.Primitive.PrimitiveMaterial.isSpecular)
+                {
+                    Ray reflectRay = Reflect(ray, I);
+                    I = scene.closestIntersect(reflectRay);
+
+                    DrawDebugRay(reflectRay, I, 0x5f5f5f);
+                }  
             }
         }
 
