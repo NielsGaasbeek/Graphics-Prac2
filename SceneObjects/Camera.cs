@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System;
 
 namespace Application
 {
@@ -24,12 +25,17 @@ namespace Application
         }
         public void transform(float up, float right, float away)
         {
+            //offsetting the position of the camera and the screen corners
             position = position + new Vector3(0.1f*up, 0.1f*right, 0.1f*away);
             p0 = p0 + new Vector3(0.1f * up, 0.1f * right, 0.1f * away);
             p1 = p1 + new Vector3(0.1f * up, 0.1f * right, 0.1f * away);
             p2 = p2 + new Vector3(0.1f * up, 0.1f * right, 0.1f * away);
         }
-
+        
+        
+           
+        
+        
         public Vector3 Position
         {
             get { return position; }
