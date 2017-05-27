@@ -22,8 +22,13 @@ namespace Application
         }
 
         public Primitive Primitive
-        { get { return intersectObj; } }
+        {
+            get { return intersectObj; }
+        }
+
         public Vector3 IntersectPosition
-        { get { return intersectPos; } }
+        {
+            get { return intersectPos; }
+        }
     }
 }
