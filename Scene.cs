@@ -57,13 +57,17 @@ namespace Application
 
         public void FillScene()
         {
-            Light light = new Light(new Vector3(0, -2, 5), new Vector3(1, 1, 1), 10); //add a light to the scene
-            Lights.Add(light);
+            Light light1 = new Light(new Vector3(-4, -1, 4), new Vector3(1, 0, 0), 10); //add a light to the scene
+            Light light2 = new Light(new Vector3(2, -2, 4), new Vector3(0, 0, 1), 10);
+            Light bigLight = new Light(new Vector3(0, -7, 2), new Vector3(1, 1, 1), 100);
+            Lights.Add(light2);
+            Lights.Add(light1);
+            Lights.Add(bigLight);
 
-            Floor = new Plane(new Vector3(0, 1, 0), -1, new Vector3(100, 100, 100)); //gray floor plane
-            Sphere1 = new Sphere(new Vector3(-3, 0, 7), 1, new Vector3(255, 0, 0)); //red sphere
-            Sphere2 = new Sphere(new Vector3(0, 0, 7), 1, new Vector3(0, 255, 0)); //green sphere
-            Sphere3 = new Sphere(new Vector3(3, 0, 7), 1, new Vector3(0, 0, 255)); //blue sphere
+            Floor = new Plane(new Vector3(0, 1, 0), -1, new Vector3(10, 10, 10), "Diffuse"); //gray floor plane
+            Sphere1 = new Sphere(new Vector3(-3, 0, 3), 1, new Vector3(255, 0, 0), "Diffuse"); //left sphere
+            Sphere2 = new Sphere(new Vector3(0, 0, 4), 1, new Vector3(255, 255, 255), "Diffuse"); //middle sphere
+            Sphere3 = new Sphere(new Vector3(3, 0, 4), 1, new Vector3(0, 0, 255), "Diffuse"); //right sphere
 
             sceneObjects.Add(Floor); //add the primitives
 

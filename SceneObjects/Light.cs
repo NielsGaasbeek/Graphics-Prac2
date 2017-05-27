@@ -15,13 +15,10 @@ namespace Application
         }
 
         public Vector3 Position
-        {
-            get { return position; }
-        }
-
+        { get { return position; } }
+        public Vector3 Color
+        { get { return color; } }
         public int Intensity
-        {
-            get { return intensity; }
-        }
+        { get { return intensity; } }
     }
 }
