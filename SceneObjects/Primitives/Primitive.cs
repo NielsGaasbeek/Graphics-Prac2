@@ -8,6 +8,7 @@ namespace Application
     {
         Vector3 primitiveColor;
         private Vector3 position;
+        Vector3 primitiveNormal;
 
         public Primitive(Vector3 color, Vector3 pos)
         {
@@ -18,6 +19,11 @@ namespace Application
         public virtual float Intersection(Ray R)
         {
             return 0;
+        }
+
+        public virtual Vector3 NormalVector(Vector3 pos)
+        {
+            return new Vector3(0, 0, 0);
         }
 
         public float dotProduct(Vector3 A, Vector3 B)

@@ -33,6 +33,11 @@ namespace Application
             else return 0;
         }
 
+        public override Vector3 NormalVector(Vector3 pos)
+        {
+            return (Position - pos).Normalized();
+        }
+
         public float Radius
         {
             get { return radius; }

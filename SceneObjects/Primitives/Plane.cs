@@ -18,5 +18,10 @@ namespace Application
             float t = -(dotProduct(R.O, normalVector) + distance) / (dotProduct(R.D, normalVector));
             return t;
         }
+
+        public override Vector3 NormalVector(Vector3 pos)
+        {
+            return normalVector;
+        }
     }
 }
