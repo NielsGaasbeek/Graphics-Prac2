@@ -67,6 +67,11 @@ namespace Application
                 tracer.renderCam.transform(0, 0, -1);
                 tracer.screen.Clear(0);
             }
+            if (keyboard[Key.Right])
+            {
+                tracer.renderCam.rotate(0, 1);
+                tracer.screen.Clear(0);
+            }
 
         }
         protected override void OnRenderFrame(FrameEventArgs e)
