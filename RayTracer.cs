@@ -21,6 +21,8 @@ namespace Application
     {
         // member variables
         public Surface screen;
+        Surface floorTex;
+        float[,] floorTexColors = new float[128, 128];
 
         public Camera renderCam;
         public Scene scene;
@@ -41,8 +43,17 @@ namespace Application
             scene = new Scene(); //create the scene
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
             ray.O = renderCam.Position;
-            
 
+            floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
+            for (int x = 0; x < 128; x++)
+            {
+                for (int y = 0; y < 128; y++)
+                {
+                    float f = ((float)(floorTex.pixels[x + y * 128] & 255)) / 256;
+                    if (f > 0) { f = 1; }
+                    floorTexColors[x, y] = f;
+                }
+            }
         }
 
         public void Render()
@@ -50,13 +61,13 @@ namespace Application
             GL.Color3(1.0f, 0.0f, 0.0f);
             GL.Begin(PrimitiveType.Triangles);
 
-            for(int y = 0; y < 512; y++)
+            for (int y = 0; y < 512; y++)
             {
-                for(int x = 0; x < 512; x++)
+                for (int x = 0; x < 512; x++)
                 {
                     float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f) / 512));
                     float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f) / 512));
-                    
+
                     Vector3 dir = new Vector3(u, v, 1) - renderCam.Position;
                     float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
                     Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
@@ -66,14 +77,12 @@ namespace Application
 
                     Intersection intersection = scene.closestIntersect(ray);
 
-                    if(intersection.Primitive != null)
+                    if (intersection.Primitive != null)
                     {
                         //here the shadowrays should be fired
                         Ray shadowRay = new Ray();
                         foreach (Light l in scene.Lights)
                         {
-                            float eps = .001f;
-
                             shadowRay.D = (intersection.IntersectPosition - l.Position);
                             shadowRay.O = l.Position;
                             shadowRay.Normalize();
@@ -86,30 +95,23 @@ namespace Application
                                 float distAttenuation = l.Intensity / (intersectDist * intersectDist);
                                 float NdotL = dotProduct(intersection.Primitive.NormalVector(intersection.IntersectPosition), shadowRay.D);
                                 if (NdotL < 0 || distAttenuation < .05f) continue;
+
                                 Vector3 color = intersection.Primitive.Color * distAttenuation * NdotL;
 
-                                screen.Plot(
-                                    x, y, 
-                                    CreateColor(
-                                        (int)color.X, 
-                                        (int)color.Y, 
-                                        (int)color.Z)
-                                        );
+                                if (intersection.Primitive is Plane) //de enigste plane is de vloer. als er meer planes zijn moet het anders of elke plane krijgt dezelfde texture
+                                {
+                                    color = shadePoint(intersection.IntersectPosition, floorTex) * distAttenuation * NdotL;
+                                }
+
+                                screen.Plot(x, y, CreateColor((int)color.X, (int)color.Y, (int)color.Z));
                             }
-
-
                         }
                     }
 
-                    if(y == 256 && x % 30 == 0)
+                    if (y == 256 && x % 30 == 0)
                     {
-                        screen.Line(
-                            TX(ray.O.X) + 512, 
-                            TY(ray.O.Z), 
-                            TX(ray.O.X + ray.D.X * intersection.Distance) + 512, 
-                            TY(ray.O.Z + ray.D.Z * intersection.Distance), 
-                            0xffff00);
-                    }                    
+                        screen.Line(TX(ray.O.X) + 512, TY(ray.O.Z), TX(ray.O.X + ray.D.X * intersection.Distance) + 512, TY(ray.O.Z + ray.D.Z * intersection.Distance), 0xffff00);
+                    }
                 }
             }
 
@@ -128,26 +130,17 @@ namespace Application
             screen.Plot(TX(renderCam.Position.X) + 513, TY(renderCam.Position.Z), 0xffffff);
 
             //screen plane
-            screen.Line(
-                TX(renderCam.p0.X) + 512,
-                TY(renderCam.p0.Z),
-                TX(renderCam.p1.X) + 512,
-                TY(renderCam.p1.Z), 0xffffff);
+            screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
 
             foreach (Sphere s in scene.Spheres)
             {
                 for (float r = 0; r < 10; r += .1f)
                 {
-                    screen.Line(
-                        TX((float)(s.Position.X + s.Radius * Math.Cos(r))) + 512,
-                        TY((float)(s.Position.Z + s.Radius * Math.Sin(r))),
-                        TX((float)(s.Position.X + s.Radius * Math.Cos(r + .1))) + 512,
-                        TY((float)(s.Position.Z + s.Radius * Math.Sin(r + .1))),
-                        CreateColor((int)s.Color.X, (int)s.Color.Y, (int)s.Color.Z)
-                        );
+                    screen.Line(TX((float)(s.Position.X + s.Radius * Math.Cos(r))) + 512, TY((float)(s.Position.Z + s.Radius * Math.Sin(r))),
+                        TX((float)(s.Position.X + s.Radius * Math.Cos(r + .1))) + 512, TY((float)(s.Position.Z + s.Radius * Math.Sin(r + .1))),
+                        CreateColor((int)s.Color.X, (int)s.Color.Y, (int)s.Color.Z));
                 }
             }
-
         }
 
         public int TX(float x)
@@ -176,16 +169,43 @@ namespace Application
 
         float CalcDistance(Vector3 pos1, Vector3 pos2)
         {
-            return (float)Math.Sqrt(
-                (pos1.X - pos2.X) * (pos1.X - pos2.X) +
-                (pos1.Y - pos2.Y) * (pos1.Y - pos2.Y) +
-                (pos1.Z - pos2.Z) * (pos1.Z - pos2.Z)
-                );
+            return (float)Math.Sqrt((pos1.X - pos2.X) * (pos1.X - pos2.X) + (pos1.Y - pos2.Y) * (pos1.Y - pos2.Y) + (pos1.Z - pos2.Z) * (pos1.Z - pos2.Z));
         }
 
         public float dotProduct(Vector3 A, Vector3 B)
         {
             return A.X * B.X + A.Y * B.Y + A.Z * B.Z;
+        }
+
+        public Vector3 shadePoint(Vector3 P, Surface T) //volgens het boek, maar ik geloof niet dat dit helemaal nodig is
+        {
+            Vector2 coord = new Vector2(P.X, P.Z);
+            float f = textureLookup(T, coord.X, coord.Y);
+            return new Vector3((int)f * 255, (int)f * 255, (int)f * 255);
+        }
+
+        public float textureLookup(Surface T, float u, float v)
+        {
+            //plane is veel groter dan de texture, dus als de positie buiten de texture (0-128) valt, coordinaten opschuiven
+            int i = (int)Math.Round(u * T.width - 0.5); 
+            while (i < 0)
+            {
+                i += 128;
+            }
+            while (i >= 128)
+            {
+                i -= 128;
+            }
+            int j = (int)Math.Round(v * T.height - 0.5);
+            while (j < 0)
+            {
+                j += 128;
+            }
+            while (j >= 128)
+            {
+                j -= 128;
+            }
+            return floorTexColors[i, j];
         }
     }
 }

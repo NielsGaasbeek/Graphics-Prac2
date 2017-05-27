@@ -1,3 +1,6 @@
+C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\bin\Debug\template.exe.config
+C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\obj\Debug\template.exe
+C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\obj\Debug\template.pdb
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\bin\Debug\template.exe.config
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\bin\Debug\template.exe
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\bin\Debug\template.pdb
@@ -5,18 +8,3 @@ D:\Users\Brian\Documents\GitHub\Graphics-Prac2\bin\Debug\OpenTK.dll
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\obj\Debug\template.csprojResolveAssemblyReference.cache
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\obj\Debug\template.exe
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\obj\Debug\template.pdb
-C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\bin\Debug\template.exe.config
-C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\obj\Debug\template.exe
-C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\obj\Debug\template.pdb
-E:\Uni\Graphics\Graphics-Prac2\bin\Debug\template.exe.config
-E:\Uni\Graphics\Graphics-Prac2\bin\Debug\template.exe
-E:\Uni\Graphics\Graphics-Prac2\bin\Debug\template.pdb
-E:\Uni\Graphics\Graphics-Prac2\bin\Debug\OpenTK.dll
-E:\Uni\Graphics\Graphics-Prac2\bin\Debug\OpenTK.dll.config
-E:\Uni\Graphics\Graphics-Prac2\obj\Debug\template.csprojResolveAssemblyReference.cache
-E:\Uni\Graphics\Graphics-Prac2\obj\Debug\template.exe
-E:\Uni\Graphics\Graphics-Prac2\obj\Debug\template.pdb
-C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\bin\Debug\template.exe
-C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\bin\Debug\template.pdb
-C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\bin\Debug\OpenTK.dll
-C:\Users\jobva\Desktop\Graphicspracticum2\Graphics-Prac2\obj\Debug\template.csprojResolveAssemblyReference.cache
