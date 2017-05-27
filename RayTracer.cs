@@ -44,7 +44,7 @@ namespace Application
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
             ray.O = renderCam.Position;
 
-            floorTex = new Surface("../../assets/pattern.png");
+            floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
             for (int x = 0; x < 128; x++)
             {
                 for (int y = 0; y < 128; y++)
@@ -98,9 +98,9 @@ namespace Application
 
                                 Vector3 color = intersection.Primitive.Color * distAttenuation * NdotL;
 
-                                if (intersection.Primitive is Plane)
+                                if (intersection.Primitive is Plane) //de enigste plane is de vloer. als er meer planes zijn moet het anders of elke plane krijgt dezelfde texture
                                 {
-                                    color = shadePoint(intersection.Primitive, intersection.IntersectPosition, floorTex) * distAttenuation * NdotL;
+                                    color = shadePoint(intersection.IntersectPosition, floorTex) * distAttenuation * NdotL;
                                 }
 
                                 screen.Plot(x, y, CreateColor((int)color.X, (int)color.Y, (int)color.Z));
@@ -177,9 +177,8 @@ namespace Application
             return A.X * B.X + A.Y * B.Y + A.Z * B.Z;
         }
 
-        public Vector3 shadePoint(Primitive s, Vector3 P, Surface T)
+        public Vector3 shadePoint(Vector3 P, Surface T) //volgens het boek, maar ik geloof niet dat dit helemaal nodig is
         {
-            Vector3 normal = s.NormalVector(P);
             Vector2 coord = new Vector2(P.X, P.Z);
             float f = textureLookup(T, coord.X, coord.Y);
             return new Vector3((int)f * 255, (int)f * 255, (int)f * 255);
@@ -187,7 +186,8 @@ namespace Application
 
         public float textureLookup(Surface T, float u, float v)
         {
-            int i = (int)Math.Round(u * T.width - 0.5);
+            //plane is veel groter dan de texture, dus als de positie buiten de texture (0-128) valt, coordinaten opschuiven
+            int i = (int)Math.Round(u * T.width - 0.5); 
             while (i < 0)
             {
                 i += 128;
