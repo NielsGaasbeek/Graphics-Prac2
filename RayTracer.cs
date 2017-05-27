@@ -56,8 +56,9 @@ namespace Application
                 {
                     float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f) / 512));
                     float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f) / 512));
-                    
-                    Vector3 dir = new Vector3(u, v, 1) - renderCam.Position;
+                    float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
+
+                    Vector3 dir = new Vector3(u, v, w) - renderCam.Position; //die w was eerst 1
                     float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
                     Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
 
