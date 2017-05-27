@@ -70,6 +70,7 @@
     <Compile Include="SceneObjects\Camera.cs" />
     <Compile Include="Intersection.cs" />
     <Compile Include="SceneObjects\Light.cs" />
+    <Compile Include="SceneObjects\Primitives\Material.cs" />
     <Compile Include="SceneObjects\Primitives\Plane.cs" />
     <Compile Include="SceneObjects\Primitives\Primitive.cs" />
     <Compile Include="RayTracer.cs" />
