@@ -41,7 +41,7 @@ namespace Application
             scale = (screen.height / (ymax - ymin));
 
             scene = new Scene(); //create the scene
-            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1)); //create the camera
+            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 90); //create the camera. the last argument is the FOV in degrees
             ray.O = renderCam.Position;
 
 
@@ -126,6 +126,7 @@ namespace Application
             {
                 Vector3 shadingCol = DirectIllumination(I);
                 Vector3 reflectCol = Trace(Reflect(ray, I), recur++);
+                
                 reflectCol /= 255;
 
                 shadingCol *= .5f;
