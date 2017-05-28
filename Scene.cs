@@ -59,7 +59,7 @@ namespace Application
         {
             Light light1 = new Light(new Vector3(-4, -1, 4), new Vector3(0, 0, 1), 10); //add a light to the scene
             Light light2 = new Light(new Vector3(2, -2, 4), new Vector3(1, 0, 0), 10);
-            Light bigLight = new Light(new Vector3(0, -3, 2), new Vector3(1, 1, 1), 15);
+            Light bigLight = new Light(new Vector3(0, -3, 2), new Vector3(1, 1, 1), 25);
             //Lights.Add(light2);
             //Lights.Add(light1);
             Lights.Add(bigLight);
@@ -70,7 +70,7 @@ namespace Application
             Sphere2 = new Sphere("Sphere2", new Vector3(0, 0, 5), 1, new Vector3(1, 1, 1), "Mirror"); //middle sphere
             Sphere3 = new Sphere("Sphere3", new Vector3(3, 0, 5), 1, new Vector3(0, 0, 255), "Specular"); //right sphere
 
-            Triangle Triangle1 = new Triangle("Triangle1", new Vector3(0,0,3), new Vector3(1,-2,4), new Vector3(2,0,3), new Vector3(255,255,255),"Diffuse");
+            Triangle Triangle1 = new Triangle("Triangle1", new Vector3(0,0,3), new Vector3(1,-2,4), new Vector3(2,0,3), new Vector3(0,0,255),"Diffuse");
 
 
             sceneObjects.Add(Floor); //add the primitives
@@ -84,7 +84,7 @@ namespace Application
             sceneObjects.Add(Sphere3);
             spheres.Add(Sphere3);
 
-            //.Add(Triangle1);
+            sceneObjects.Add(Triangle1);
         }
     }
 }
