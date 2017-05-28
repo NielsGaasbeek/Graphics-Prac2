@@ -15,7 +15,7 @@ namespace Application
 
         public override float Intersection(Ray R)
         {
-            float t = -(dotProduct(R.O, normalVector) + distance) / (dotProduct(R.D, normalVector));
+            float t = -(DotProduct(R.O, normalVector) + distance) / (DotProduct(R.D, normalVector));
             return t;
         }
 
