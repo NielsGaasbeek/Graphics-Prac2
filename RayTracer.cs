@@ -23,6 +23,7 @@ namespace Application
         public Surface screen;
         Surface floorTex;
         float[,] floorTexColors = new float[128, 128];
+        float[] AA = new float[4*2];
 
         public Camera renderCam;
         public Scene scene;
@@ -44,6 +45,10 @@ namespace Application
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 90); //create the camera. the last argument is the FOV in degrees
             ray.O = renderCam.Position;
 
+            AA[0] = -1f / 4f; AA[1] = -1f / 4f;
+            AA[2] = -1f / 4f; AA[3] = 1f / 4f;
+            AA[4] = 1f / 4f; AA[5] = -1f / 4f;
+            AA[6] = 1f / 4f; AA[7] = 1f / 4f;
 
             floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
             for (int x = 0; x < 128; x++)
@@ -67,28 +72,34 @@ namespace Application
             {
                 for (int x = 512; x > 0; x--)
                 {
-                    float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f) / 512));
-                    float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f) / 512));
-                    float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
+                    Vector3 color = new Vector3(0, 0, 0);
+                    Intersection I = new Intersection(0f,null,color);
 
-                    Vector3 dir = new Vector3(u, v, w) - renderCam.Position; //die w was eerst 1
+                    for (int sample = 0; sample < 4; sample++)
+                    {
+                        float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f + AA[2 * sample]) / 512));
+                        float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f + AA[2 * sample + 1]) / 512));
+                        float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
+
+                        Vector3 dir = new Vector3(u, v, w) - renderCam.Position; //die w was eerst 1
                                        
 
-                    float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
-                    Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
+                        float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
+                        Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
 
-                    ray.D = normDir;
+                        ray.D = normDir;
 
-                    ray.D = new Vector3(u, v, w) - renderCam.Position;
+                        ray.D = new Vector3(u, v, w) - renderCam.Position;
 
-                    ray.O = renderCam.Position;
-                    ray.Normalize();
+                        ray.O = renderCam.Position;
+                        ray.Normalize();
 
-                    Vector3 color = new Vector3(1, 1, 1);
+                        I = scene.closestIntersect(ray);
+                        if (I.Primitive != null)
+                            color += Trace(ray, 0);
+                    }
 
-                    Intersection I = scene.closestIntersect(ray);
-                    if (I.Primitive != null)
-                        color = Trace(ray, 0);
+                    color /= 4.0f;
 
                     screen.Plot(
                         x, y,
@@ -114,7 +125,7 @@ namespace Application
 
             if (I.Primitive.PrimitiveMaterial.isMirror)
             {
-                if (recur < 16)
+                if (recur < 8)
                     return primColor * Trace(Reflect(ray, I), recur++);
                 return new Vector3(1, 1, 1);
             }
@@ -207,6 +218,10 @@ namespace Application
 
             foreach (Sphere s in scene.Spheres)
             {
+                Vector3 sphereColor = s.PrimitiveColor;
+                if (s.PrimitiveMaterial.isMirror)
+                    sphereColor = new Vector3(255, 255, 255);
+
                 for (float r = 0; r < 10; r += .1f)
                 {
                     screen.Line(
@@ -214,7 +229,7 @@ namespace Application
                         TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r))),
                         TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r + .1))) + 512,
                         TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r + .1))),
-                        CreateColor((int)s.PrimitiveColor.X, (int)s.PrimitiveColor.Y, (int)s.PrimitiveColor.Z)
+                        CreateColor((int)sphereColor.X, (int)sphereColor.Y, (int)sphereColor.Z)
                         );
                 }
             }
@@ -230,7 +245,7 @@ namespace Application
                     TY(ray.O.Z + ray.D.Z * I.Distance),
                     color
                         );
-            /*
+            
             if (I.Primitive != null)
             {
                 //draws reflective rays
@@ -249,7 +264,7 @@ namespace Application
 
                     DrawDebugRay(reflectRay, I, 0x5f5f5f);
                 }  
-            }*/
+            }
         }
 
         public int TX(float x)
