@@ -74,8 +74,12 @@ namespace Application
             }
             if (keyboard[Key.ControlLeft])
             {
-                tracer.renderCam.transform(0, 1, 0);
-                tracer.screen.Clear(0);
+                if (tracer.renderCam.Position.Y < 0)
+                {
+                    tracer.renderCam.transform(0, 1, 0);
+                    tracer.screen.Clear(0);
+                }
+                
             }
             if (keyboard[Key.ShiftLeft])
             {
