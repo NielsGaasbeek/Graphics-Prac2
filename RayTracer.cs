@@ -63,9 +63,9 @@ namespace Application
             GL.Color3(1.0f, 0.0f, 0.0f);
             GL.Begin(PrimitiveType.Triangles);
 
-            for (int y = 0; y < 512; y++)
+            for (int y = 512; y > 0; y--)
             {
-                for (int x = 0; x < 512; x++)
+                for (int x = 512; x > 0; x--)
                 {
                     float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f) / 512));
                     float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f) / 512));
@@ -229,7 +229,7 @@ namespace Application
                     TY(ray.O.Z + ray.D.Z * I.Distance),
                     color
                         );
-
+            /*
             if (I.Primitive != null)
             {
                 //draws reflective rays
@@ -248,7 +248,7 @@ namespace Application
 
                     DrawDebugRay(reflectRay, I, 0x5f5f5f);
                 }  
-            }
+            }*/
         }
 
         public int TX(float x)

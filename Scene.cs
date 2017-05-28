@@ -70,6 +70,8 @@ namespace Application
             Sphere2 = new Sphere("Sphere2", new Vector3(0, 0, 5), 1, new Vector3(1, 1, 1), "Mirror"); //middle sphere
             Sphere3 = new Sphere("Sphere3", new Vector3(3, 0, 5), 1, new Vector3(0, 0, 255), "Specular"); //right sphere
 
+            Triangle Triangle1 = new Triangle("Triangle1", new Vector3(0,0,3), new Vector3(1,-2,4), new Vector3(2,0,3), new Vector3(255,255,255),"Diffuse");
+
 
             sceneObjects.Add(Floor); //add the primitives
 
@@ -81,6 +83,8 @@ namespace Application
 
             sceneObjects.Add(Sphere3);
             spheres.Add(Sphere3);
+
+            //.Add(Triangle1);
         }
     }
 }
