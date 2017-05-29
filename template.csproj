@@ -70,11 +70,13 @@
     <Compile Include="SceneObjects\Camera.cs" />
     <Compile Include="Intersection.cs" />
     <Compile Include="SceneObjects\Light.cs" />
+    <Compile Include="SceneObjects\Primitives\Material.cs" />
     <Compile Include="SceneObjects\Primitives\Plane.cs" />
     <Compile Include="SceneObjects\Primitives\Primitive.cs" />
     <Compile Include="RayTracer.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="SceneObjects\Primitives\Sphere.cs" />
+    <Compile Include="SceneObjects\Primitives\Triangle.cs" />
     <Compile Include="surface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

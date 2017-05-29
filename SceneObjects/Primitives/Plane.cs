@@ -7,7 +7,7 @@ namespace Application
         Vector3 normalVector;
         float distance;
 
-        public Plane(Vector3 norm, float d, Vector3 color, string mat) : base(color, new Vector3(0,0,0), mat)
+        public Plane(string ID, Vector3 norm, float d, Vector3 color, string mat) : base(ID, color, new Vector3(0,0,0), mat)
         {
             normalVector = norm;
             distance = d;
@@ -15,7 +15,7 @@ namespace Application
 
         public override float Intersection(Ray R)
         {
-            float t = -(dotProduct(R.O, normalVector) + distance) / (dotProduct(R.D, normalVector));
+            float t = -(DotProduct(R.O, normalVector) + distance) / (DotProduct(R.D, normalVector));
             return t;
         }
 
