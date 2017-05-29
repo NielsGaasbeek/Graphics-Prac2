@@ -58,7 +58,7 @@ namespace Application
         public void FillScene()
         {
             Light light1 = new Light(new Vector3(-2, -2, 1), new Vector3(1, 0, 0), 10); //add a light to the scene
-            Light light2 = new Light(new Vector3(2, -2, 1), new Vector3(0, 1, 0), 10);
+            Light light2 = new Light(new Vector3(2, -2, 7), new Vector3(0, 1, 0), 10);
             Light bigLight = new Light(new Vector3(0, -3, 2), new Vector3(1, 1, 1), 25);
 
             Lights.Add(bigLight);

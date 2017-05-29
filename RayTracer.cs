@@ -290,7 +290,7 @@ namespace Application
 
                         Intersection newI = scene.closestIntersect(shadowRay);
 
-                        //if ((int)(length) == (int)(newI.Distance))
+                        if ((int)(length * 100) == (int)(newI.Distance * 100))
                             screen.Line(
                                 TX(shadowRay.O.X) + 512,
                                 TY(shadowRay.O.Z),
