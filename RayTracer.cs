@@ -104,12 +104,7 @@ namespace Application
                             color += Trace(ray, 0);
                         else
                         {
-                            //bereken HDR coords
-                            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y)) * 1500;
-                            int HDRx = (int)Math.Abs((ray.D.X * r));
-                            int HDRy = (int)Math.Abs((ray.D.Y * r));
-                            Color pixelCol = environment.bmp.GetPixel(HDRx, HDRy);
-                            color = new Vector3(pixelCol.R, pixelCol.G, pixelCol.B);
+                            color += GetEnvironment(ray);
                         }
                     }
                     color /= 4.0f;
@@ -145,7 +140,7 @@ namespace Application
         public Vector3 Trace(Ray ray, int recur)
         {
             Intersection I = scene.closestIntersect(ray);
-            if (I.Primitive == null) return new Vector3(1, 1, 1);
+            if (I.Primitive == null) return GetEnvironment(ray);
 
             Vector3 primColor = I.Primitive.PrimitiveColor;
 
@@ -219,6 +214,16 @@ namespace Application
             return color;
         }
 
+        public Vector3 GetEnvironment(Ray ray)
+        {
+            //bereken HDR coords
+            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y));
+            float HDRx = MathHelper.Clamp(((ray.D.X * r + 1) * 750), 0, 1499);
+            float HDRy = MathHelper.Clamp(((ray.D.Y * r + 1) * 750), 0, 1499);
+            Color pixelCol = environment.bmp.GetPixel((int)HDRx, (int)HDRy);
+            return new Vector3(pixelCol.R, pixelCol.G, pixelCol.B);
+        }
+
         public bool IsVisible(Intersection I, Ray L, float intersectDist)
         {
             Intersection lightIntersect = scene.closestIntersect(L);
@@ -239,6 +244,7 @@ namespace Application
             //camera
             screen.Plot(TX(renderCam.Position.X) + 512, TY(renderCam.Position.Z), 0xffffff); //x+512 voor rechterkant scherm
             screen.Plot(TX(renderCam.Position.X) + 513, TY(renderCam.Position.Z), 0xffffff);
+            screen.Print("FOV: " + renderCam.FOV, 513, 5, 0xffffff);
 
             //screen plane
             screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
