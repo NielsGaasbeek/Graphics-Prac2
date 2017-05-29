@@ -46,7 +46,7 @@ namespace Application
             var keyboard = OpenTK.Input.Keyboard.GetState();
             if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
 
-            if (keyboard[Key.Space]) tracer.Render();
+            if (keyboard[Key.Space]) { tracer.Render(); }
             if (keyboard[Key.A])
             {
                 tracer.renderCam.transform(-1, 0, 0);
@@ -69,26 +69,39 @@ namespace Application
             }
             if (keyboard[Key.Right])
             {
-                //tracer.renderCam.rotate();
-                //tracer.screen.Clear(0);
+                tracer.renderCam.rotate(0, .1f);
+                tracer.screen.Clear(0);
+            }
+            if (keyboard[Key.Left])
+            {
+                tracer.renderCam.rotate(0, -.1f);
+                tracer.screen.Clear(0);
+            }
+            if (keyboard[Key.Up])
+            {
+                tracer.renderCam.rotate(.1f, 0);
+                tracer.screen.Clear(0);
+            }
+            if (keyboard[Key.Down])
+            {
+                tracer.renderCam.rotate(-.1f, 0);
+                tracer.screen.Clear(0);
             }
             if (keyboard[Key.ControlLeft])
             {
-                if (tracer.renderCam.Position.Y < 0)
+                if (tracer.renderCam.position.Y < 0)
                 {
                     tracer.renderCam.transform(0, 1, 0);
                     tracer.screen.Clear(0);
-                }
-                
+                }                
             }
             if (keyboard[Key.ShiftLeft])
             {
                 tracer.renderCam.transform(0, -1, 0);
                 tracer.screen.Clear(0);
             }
-
-
         }
+
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.ClearColor(Color.Black);
@@ -97,7 +110,7 @@ namespace Application
             GL.Color3(1.0f, 1.0f, 1.0f);
 
             // called once per frame; render
-            tracer.Tick();
+            tracer.DebugOutput();
             if (terminated)
             {
                 Exit();

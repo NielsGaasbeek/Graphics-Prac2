@@ -33,7 +33,6 @@ namespace Application
         public Scene scene;
 
         Ray ray = new Ray();
-        Vector3 point = new Vector3(0, 0, 0);
 
         //coordinate system
         float xmin = -5; float xmax = 5;
@@ -48,8 +47,9 @@ namespace Application
 
             scene = new Scene(); //create the scene
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 90); //create the camera. the last argument is the FOV in degrees
-            ray.O = renderCam.Position;
+            ray.O = renderCam.position;
 
+            //offset-array used for Anti-Aliasing
             AA[0] = -1f / 4f; AA[1] = -1f / 4f;
             AA[2] = -1f / 4f; AA[3] = 1f / 4f;
             AA[4] = 1f / 4f; AA[5] = -1f / 4f;
@@ -75,26 +75,21 @@ namespace Application
                 for (int x = 0; x < width; x++)
                 {
                     Vector3 color = new Vector3(0, 0, 0);
-                    Intersection I = new Intersection(0f,null,color);
+                    Intersection I = null;
 
                     for (int sample = 0; sample < 4; sample++)
-                    {
-                        float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f + AA[2 * sample]) / 512));
-                        float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f + AA[2 * sample + 1]) / 512));
-                        float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
+                    {                        
+                        float normalized_x = (x + 0.5f + AA[2 * sample]) / width ;
+                        float normalized_y = (y + 0.5f + AA[2 * sample + 1]) / height;
 
-                        Vector3 dir = new Vector3(u, v, w) - renderCam.Position; //die w was eerst 1
-                                       
+                        Vector3 imagePoint = renderCam.p0 + (normalized_x * renderCam.right_direction * 2) - (normalized_y * renderCam.up_direction * 2);
+                        Vector3 dir = imagePoint - renderCam.position;
 
-                        float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
-                        Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
+                        ray.D = dir;
 
-                        ray.D = normDir;
-
-                        ray.D = new Vector3(u, v, w) - renderCam.Position;
-
-                        ray.O = renderCam.Position;
+                        ray.O = renderCam.position;
                         ray.Normalize();
+
 
                         I = scene.closestIntersect(ray);
                         if (I.Primitive != null)
@@ -140,7 +135,7 @@ namespace Application
 
             if (I.Primitive.PrimitiveMaterial.isMirror)
             {
-                if (recur < 8)
+                if (recur < 1)
                     return primColor * Trace(Reflect(ray, I), recur++);
                 return new Vector3(1, 1, 1);
             }
@@ -218,18 +213,22 @@ namespace Application
         }
 
         // tick: renders one frame
-        public void Tick()
+        public void DebugOutput()
         {
             //screen.Clear(0);
             screen.Line(TX(5), TY(ymax), TX(5), TY(ymin), 0xffffff);
 
             //debug view
             //camera
-            screen.Plot(TX(renderCam.Position.X) + 512, TY(renderCam.Position.Z), 0xffffff); //x+512 voor rechterkant scherm
-            screen.Plot(TX(renderCam.Position.X) + 513, TY(renderCam.Position.Z), 0xffffff);
+            screen.Plot(TX(renderCam.position.X) + 512, TY(renderCam.position.Z), 0xffffff); //x+512 voor rechterkant scherm
+            screen.Plot(TX(renderCam.position.X) + 513, TY(renderCam.position.Z), 0xffffff);
 
             //screen plane
             screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
+
+            screen.Print("Camera-Height: " + (-1 * renderCam.position.Y + 1), 513, 1, 0xffffff);
+            Console.WriteLine(renderCam.Position.Y);
+            screen.Print("Camera-Downward Angle: " + renderCam.camera_direction.Y, 513, 16, 0xffffff);
 
             foreach (Sphere s in scene.Spheres)
             {
@@ -265,7 +264,7 @@ namespace Application
             //draws reflective rays
             if (I.Primitive != null)
             {
-                if (I.IntersectPosition.X > 10  || I.IntersectPosition.X < -10 || I.IntersectPosition.Z > 10 || I.IntersectPosition.Z < -10) return;
+                if (I.IntersectPosition.X > xmax  || I.IntersectPosition.X < xmin || I.IntersectPosition.Z > ymax || I.IntersectPosition.Z < ymin) return;
 
                 if(I.Primitive.PrimitiveMaterial.isMirror || I.Primitive.PrimitiveMaterial.isSpecular)
                 {
@@ -332,9 +331,18 @@ namespace Application
             return (float)Math.Sqrt((vec.X * vec.X) + (vec.Y * vec.Y) + (vec.Z * vec.Z));
         }
 
-        public float dotProduct(Vector3 A, Vector3 B)
+        public static float dotProduct(Vector3 A, Vector3 B)
         {
             return ((A.X * B.X) + (A.Y * B.Y) + (A.Z * B.Z));
+        }
+        public static Vector3 CrossProduct(Vector3 A, Vector3 B)
+        {
+            Vector3 crossProduct;
+            crossProduct.X = (A.Y * B.Z) - (A.Z * B.Y);
+            crossProduct.Y = (A.Z * B.X) - (A.X * B.Z);
+            crossProduct.Z = (A.X * B.Y) - (A.Y * B.X);
+
+            return crossProduct;
         }
 
         public Vector3 shadePoint(Vector3 P, Surface T) //volgens het boek, maar ik geloof niet dat dit helemaal nodig is

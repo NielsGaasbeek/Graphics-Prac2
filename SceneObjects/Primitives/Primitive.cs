@@ -20,6 +20,7 @@ namespace Application
             primitiveColor = color;
             position = pos;
             material = new Material(mat);
+            if (material.isMirror) primitiveColor /= 255;
         }
         
         public virtual float Intersection(Ray R)
