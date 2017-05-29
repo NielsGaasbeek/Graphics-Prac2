@@ -7,7 +7,7 @@ namespace Application
     {
         public Vector3 position, direction, screenCenter;
         public Vector3 p0, p1, p2; //screen corners
-        float FOV;
+        public float FOV;
         float d;
         //for FOV adjustment
         
