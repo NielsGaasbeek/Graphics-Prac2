@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Drawing;
 
 namespace Application
 {
@@ -23,6 +24,7 @@ namespace Application
         public Surface screen;
 
         Surface floorTex;
+        Surface environment; //HDR picture
         float[,] floorTexColors = new float[128, 128];
 
         int width = 512, height = 512;
@@ -55,6 +57,7 @@ namespace Application
             AA[4] = 1f / 4f; AA[5] = -1f / 4f;
             AA[6] = 1f / 4f; AA[7] = 1f / 4f;
 
+            environment = new Surface("../../assets/uffizi_probe.png");
             floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
             for (int x = 0; x < 128; x++)
             {
@@ -75,7 +78,7 @@ namespace Application
                 for (int x = 0; x < width; x++)
                 {
                     Vector3 color = new Vector3(0, 0, 0);
-                    Intersection I = new Intersection(0f,null,color);
+                    Intersection I = new Intersection(0f, null, color);
 
                     for (int sample = 0; sample < 4; sample++)
                     {
@@ -84,7 +87,7 @@ namespace Application
                         float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
 
                         Vector3 dir = new Vector3(u, v, w) - renderCam.Position; //die w was eerst 1
-                                       
+
 
                         float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
                         Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
@@ -99,6 +102,10 @@ namespace Application
                         I = scene.closestIntersect(ray);
                         if (I.Primitive != null)
                             color += Trace(ray, 0);
+                        else
+                        {
+                            color += GetEnvironment(ray);
+                        }
                     }
                     color /= 4.0f;
 
@@ -133,7 +140,7 @@ namespace Application
         public Vector3 Trace(Ray ray, int recur)
         {
             Intersection I = scene.closestIntersect(ray);
-            if (I.Primitive == null) return new Vector3(1, 1, 1);
+            if (I.Primitive == null) return GetEnvironment(ray);
 
             Vector3 primColor = I.Primitive.PrimitiveColor;
 
@@ -152,7 +159,7 @@ namespace Application
             {
                 Vector3 shadingCol = DirectIllumination(I);
                 Vector3 reflectCol = Trace(Reflect(ray, I), recur++);
-                
+
                 reflectCol /= 255;
 
                 shadingCol *= .5f;
@@ -170,7 +177,7 @@ namespace Application
             return DirectIllumination(I) * primColor;
 
         }
-        
+
         public Ray Reflect(Ray ray, Intersection I)
         {
             Ray reflectRay = new Ray();
@@ -181,7 +188,7 @@ namespace Application
 
             return reflectRay;
         }
-        
+
         public Vector3 DirectIllumination(Intersection I)
         {
             Ray shadowRay = new Ray();
@@ -207,6 +214,16 @@ namespace Application
             return color;
         }
 
+        public Vector3 GetEnvironment(Ray ray)
+        {
+            //bereken HDR coords
+            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y));
+            float HDRx = MathHelper.Clamp(((ray.D.X * r + 1) * 750), 0, 1499);
+            float HDRy = MathHelper.Clamp(((ray.D.Y * r + 1) * 750), 0, 1499);
+            Color pixelCol = environment.bmp.GetPixel((int)HDRx, (int)HDRy);
+            return new Vector3(pixelCol.R, pixelCol.G, pixelCol.B);
+        }
+
         public bool IsVisible(Intersection I, Ray L, float intersectDist)
         {
             Intersection lightIntersect = scene.closestIntersect(L);
@@ -227,6 +244,8 @@ namespace Application
             //camera
             screen.Plot(TX(renderCam.Position.X) + 512, TY(renderCam.Position.Z), 0xffffff); //x+512 voor rechterkant scherm
             screen.Plot(TX(renderCam.Position.X) + 513, TY(renderCam.Position.Z), 0xffffff);
+            screen.Print("Camera: (" + Math.Round(renderCam.position.X, 1) + "; " + Math.Round(renderCam.position.Y, 1) + "; " + Math.Round(renderCam.position.Z, 1) + ")", 513, 5, 0xffffff);
+            screen.Print("FOV: " + renderCam.FOV, 513, 25, 0xffffff);
 
             //screen plane
             screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
@@ -347,7 +366,7 @@ namespace Application
         public float textureLookup(Surface T, float u, float v)
         {
             //plane is veel groter dan de texture, dus als de positie buiten de texture (0-128) valt, coordinaten opschuiven
-            int i = (int)Math.Round(u * T.width - 0.5); 
+            int i = (int)Math.Round(u * T.width - 0.5);
             while (i < 0)
             {
                 i += 128;
