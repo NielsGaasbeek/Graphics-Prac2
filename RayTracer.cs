@@ -22,10 +22,14 @@ namespace Application
     {
         // member variables
         public Surface screen;
+
         Surface floorTex;
         Surface environment; //HDR picture
         float[,] floorTexColors = new float[128, 128];
-        float[] AA = new float[4 * 2];
+
+        int width = 512, height = 512;
+        Vector3[] image;
+        float[] AA = new float[4*2];
 
         public Camera renderCam;
         public Scene scene;
@@ -42,6 +46,7 @@ namespace Application
         public void Init()
         {
             scale = (screen.height / (ymax - ymin));
+            image = new Vector3[(width * height)];
 
             scene = new Scene(); //create the scene
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 90); //create the camera. the last argument is the FOV in degrees
@@ -68,12 +73,9 @@ namespace Application
 
         public void Render()
         {
-            GL.Color3(1.0f, 0.0f, 0.0f);
-            GL.Begin(PrimitiveType.Triangles);
-
-            for (int y = 512; y > 0; y--)
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 512; x > 0; x--)
+                for (int x = 0; x < width; x++)
                 {
                     Vector3 color = new Vector3(0, 0, 0);
                     Intersection I = new Intersection(0f, null, color);
@@ -110,21 +112,34 @@ namespace Application
                             color = new Vector3(pixelCol.R, pixelCol.G, pixelCol.B);
                         }
                     }
-
                     color /= 4.0f;
 
-                    screen.Plot(
-                        x, y,
-                        CreateColor(
-                            (int)color.X,
-                            (int)color.Y,
-                            (int)color.Z));
+                    image[x + width * y] = color;
+
 
                     if (y == 256 && x % 30 == 0)
                         DrawDebugRay(ray, I, 0xffff00);
                 }
             }
-            GL.End();
+            RenderScreen();
+        }
+
+        void RenderScreen()
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Vector3 color = image[x + width * y];
+
+                    screen.Plot(
+                            x, y,
+                            CreateColor(
+                                (int)color.X,
+                                (int)color.Y,
+                                (int)color.Z));
+                }
+            }
         }
 
         public Vector3 Trace(Ray ray, int recur)
@@ -258,23 +273,44 @@ namespace Application
                     color
                         );
 
+
+            //draws reflective rays
             if (I.Primitive != null)
             {
-                //draws reflective rays
-                if (I.Primitive.PrimitiveMaterial.isMirror)
-                {
-                    Ray reflectRay = Reflect(ray, I);
-                    I = scene.closestIntersect(reflectRay);
+                if (I.IntersectPosition.X > 10  || I.IntersectPosition.X < -10 || I.IntersectPosition.Z > 10 || I.IntersectPosition.Z < -10) return;
 
-                    DrawDebugRay(reflectRay, I, 0x5f5f5f);
+                if(I.Primitive.PrimitiveMaterial.isMirror || I.Primitive.PrimitiveMaterial.isSpecular)
+                {
+                    bool wasMirror = I.Primitive.PrimitiveMaterial.isMirror;
+                    Ray reflectRay = Reflect(ray, I);
+                    Intersection newI = scene.closestIntersect(reflectRay);
+                    DrawDebugRay(reflectRay, newI, 0x5f5f5f);
+
+                    if (wasMirror) return;
                 }
 
-                else if (I.Primitive.PrimitiveMaterial.isSpecular)
+                if (I.Primitive.PrimitiveMaterial.isDiffuse || I.Primitive.PrimitiveMaterial.isSpecular)
                 {
-                    Ray reflectRay = Reflect(ray, I);
-                    I = scene.closestIntersect(reflectRay);
+                    Ray shadowRay = new Ray();
 
-                    DrawDebugRay(reflectRay, I, 0x5f5f5f);
+                    foreach (Light l in scene.Lights)
+                    {
+                        shadowRay.D = (I.IntersectPosition - l.Position);
+                        shadowRay.O = l.Position;
+                        float length = Length(shadowRay.D);
+                        shadowRay.Normalize();
+
+                        Intersection newI = scene.closestIntersect(shadowRay);
+
+                        if ((int)(length * 100) == (int)(newI.Distance * 100))
+                            screen.Line(
+                                TX(shadowRay.O.X) + 512,
+                                TY(shadowRay.O.Z),
+                                TX(shadowRay.O.X + shadowRay.D.X * newI.Distance) + 512,
+                                TY(shadowRay.O.Z + shadowRay.D.Z * newI.Distance),
+                                CreateColor((int)l.Color.X * 255, (int)l.Color.Y * 255, (int)l.Color.Z * 255)
+                                        );
+                    }              
                 }
             }
         }
