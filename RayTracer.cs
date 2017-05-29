@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Drawing;
 
 namespace Application
 {
@@ -22,8 +23,9 @@ namespace Application
         // member variables
         public Surface screen;
         Surface floorTex;
+        Surface environment; //HDR picture
         float[,] floorTexColors = new float[128, 128];
-        float[] AA = new float[4*2];
+        float[] AA = new float[4 * 2];
 
         public Camera renderCam;
         public Scene scene;
@@ -50,6 +52,7 @@ namespace Application
             AA[4] = 1f / 4f; AA[5] = -1f / 4f;
             AA[6] = 1f / 4f; AA[7] = 1f / 4f;
 
+            environment = new Surface("../../assets/uffizi_probe.png");
             floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
             for (int x = 0; x < 128; x++)
             {
@@ -73,7 +76,7 @@ namespace Application
                 for (int x = 512; x > 0; x--)
                 {
                     Vector3 color = new Vector3(0, 0, 0);
-                    Intersection I = new Intersection(0f,null,color);
+                    Intersection I = new Intersection(0f, null, color);
 
                     for (int sample = 0; sample < 4; sample++)
                     {
@@ -82,7 +85,7 @@ namespace Application
                         float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
 
                         Vector3 dir = new Vector3(u, v, w) - renderCam.Position; //die w was eerst 1
-                                       
+
 
                         float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
                         Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
@@ -97,6 +100,15 @@ namespace Application
                         I = scene.closestIntersect(ray);
                         if (I.Primitive != null)
                             color += Trace(ray, 0);
+                        else
+                        {
+                            //bereken HDR coords
+                            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y)) * 1500;
+                            int HDRx = (int)Math.Abs((ray.D.X * r));
+                            int HDRy = (int)Math.Abs((ray.D.Y * r));
+                            Color pixelCol = environment.bmp.GetPixel(HDRx, HDRy);
+                            color = new Vector3(pixelCol.R, pixelCol.G, pixelCol.B);
+                        }
                     }
 
                     color /= 4.0f;
@@ -137,7 +149,7 @@ namespace Application
             {
                 Vector3 shadingCol = DirectIllumination(I);
                 Vector3 reflectCol = Trace(Reflect(ray, I), recur++);
-                
+
                 reflectCol /= 255;
 
                 shadingCol *= .5f;
@@ -155,7 +167,7 @@ namespace Application
             return DirectIllumination(I) * primColor;
 
         }
-        
+
         public Ray Reflect(Ray ray, Intersection I)
         {
             Ray reflectRay = new Ray();
@@ -166,7 +178,7 @@ namespace Application
 
             return reflectRay;
         }
-        
+
         public Vector3 DirectIllumination(Intersection I)
         {
             Ray shadowRay = new Ray();
@@ -245,7 +257,7 @@ namespace Application
                     TY(ray.O.Z + ray.D.Z * I.Distance),
                     color
                         );
-            
+
             if (I.Primitive != null)
             {
                 //draws reflective rays
@@ -263,7 +275,7 @@ namespace Application
                     I = scene.closestIntersect(reflectRay);
 
                     DrawDebugRay(reflectRay, I, 0x5f5f5f);
-                }  
+                }
             }
         }
 
@@ -311,7 +323,7 @@ namespace Application
         public float textureLookup(Surface T, float u, float v)
         {
             //plane is veel groter dan de texture, dus als de positie buiten de texture (0-128) valt, coordinaten opschuiven
-            int i = (int)Math.Round(u * T.width - 0.5); 
+            int i = (int)Math.Round(u * T.width - 0.5);
             while (i < 0)
             {
                 i += 128;
