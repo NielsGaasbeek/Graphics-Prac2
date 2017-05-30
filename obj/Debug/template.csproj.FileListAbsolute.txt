@@ -20,3 +20,10 @@ E:\Uni\Graphics\prac2\Graphics-Prac2\bin\Debug\OpenTK.dll.config
 E:\Uni\Graphics\prac2\Graphics-Prac2\obj\Debug\template.csprojResolveAssemblyReference.cache
 E:\Uni\Graphics\prac2\Graphics-Prac2\obj\Debug\template.exe
 E:\Uni\Graphics\prac2\Graphics-Prac2\obj\Debug\template.pdb
+D:\Uni\Graphics\prac2\Graphics-Prac2\obj\Debug\template.exe
+D:\Uni\Graphics\prac2\Graphics-Prac2\obj\Debug\template.pdb
+D:\Uni\Graphics\prac2\Graphics-Prac2\bin\Debug\template.exe.config
+D:\Uni\Graphics\prac2\Graphics-Prac2\bin\Debug\template.exe
+D:\Uni\Graphics\prac2\Graphics-Prac2\bin\Debug\template.pdb
+D:\Uni\Graphics\prac2\Graphics-Prac2\bin\Debug\OpenTK.dll
+D:\Uni\Graphics\prac2\Graphics-Prac2\bin\Debug\OpenTK.dll.config

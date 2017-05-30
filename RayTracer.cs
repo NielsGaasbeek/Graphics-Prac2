@@ -78,36 +78,17 @@ namespace Application
                 {
                     Vector3 color = new Vector3(0, 0, 0);
 
-<<<<<<< HEAD
                     Intersection I = null;
-=======
-                    for (int sample = 0; sample < 4; sample++)
-                    {
-                        float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f + AA[2 * sample]) / 512));
-                        float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f + AA[2 * sample + 1]) / 512));
-                        float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
-
-                        Vector3 dir = new Vector3(u, v, w) - renderCam.position; //die w was eerst 1
-
-
-                        float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
-                        Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
->>>>>>> refs/remotes/origin/master
-
                     for (int sample = 0; sample < 4; sample++)
                     {                        
                         float normalized_x = (x + 0.5f + AA[2 * sample]) / width ;
                         float normalized_y = (y + 0.5f + AA[2 * sample + 1]) / height;
 
-<<<<<<< HEAD
                         Vector3 imagePoint = renderCam.p0 + 
                                             (normalized_x * renderCam.right_direction * 2) - 
                                             (normalized_y * renderCam.up_direction * 2);
                         Vector3 dir = imagePoint - renderCam.position;
                         ray.D = dir;
-=======
-                        ray.D = new Vector3(u, v, w) - renderCam.position;
->>>>>>> refs/remotes/origin/master
 
                         ray.O = renderCam.position;
                         ray.Normalize();
@@ -256,24 +237,16 @@ namespace Application
 
             //debug view
             //camera
-<<<<<<< HEAD
 
-            screen.Plot(TX(renderCam.Position.X) + 512, TY(renderCam.Position.Z), 0xffffff); //x+512 voor rechterkant scherm
-            screen.Plot(TX(renderCam.Position.X) + 513, TY(renderCam.Position.Z), 0xffffff);
-            screen.Print("Camera: (" + Math.Round(renderCam.position.X, 1) + "; " + Math.Round(renderCam.position.Y, 1) + "; " + Math.Round(renderCam.position.Z, 1) + ")", 513, 25, 0xffffff);
-            screen.Print("FOV: " + renderCam.FOV, 513, 5, 0xffffff);
-
-=======
             screen.Plot(TX(renderCam.position.X) + 512, TY(renderCam.position.Z), 0xffffff); //x+512 voor rechterkant scherm
             screen.Plot(TX(renderCam.position.X) + 513, TY(renderCam.position.Z), 0xffffff);
-            screen.Print("Camera: (" + Math.Round(renderCam.position.X, 1) + "; " + Math.Round(renderCam.position.Y, 1) + "; " + Math.Round(renderCam.position.Z, 1) + ")", 513, 5, 0xffffff);
-            screen.Print("FOV: " + renderCam.fovv, 513, 25, 0xffffff);
->>>>>>> refs/remotes/origin/master
+            screen.Print("Camera: (" + Math.Round(renderCam.position.X, 1) + "; " + Math.Round(renderCam.position.Y, 1) + "; " + Math.Round(renderCam.position.Z, 1) + ")", 513, 25, 0xffffff);
+            screen.Print("Camera-Downward Angle: " + renderCam.camera_direction.Y, 720, 5, 0xffffff);
+            screen.Print("FOV: " + renderCam.fovv, 513, 5, 0xffffff);
 
             //screen plane
             screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
 
-            screen.Print("Camera-Downward Angle: " + renderCam.camera_direction.Y, 720, 5, 0xffffff);
 
             foreach (Primitive p in scene.Primitives)
             {

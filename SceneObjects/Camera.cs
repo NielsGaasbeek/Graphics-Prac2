@@ -15,13 +15,9 @@ namespace Application
 
         public Camera(Vector3 position, Vector3 direction, float fov)
         {
-<<<<<<< HEAD
-            FOV = fov * (float)Math.PI / 180;
-=======
             //turning degrees into radians and using them to calculate the distance to screen with a given FOV.
             fovv = fov;
             FOV = fov*(float)Math.PI/180;
->>>>>>> refs/remotes/origin/master
             d = 1 / (float)(Math.Tan(FOV / 2));
 
             this.position = position;
@@ -43,7 +39,6 @@ namespace Application
         }
         public void rotate(float up, float right)
         {
-<<<<<<< HEAD
             camera_direction += (right * right_direction);
             camera_direction += (up * up_direction);
 
@@ -74,19 +69,5 @@ namespace Application
             return v / length;
         }
 
-        public Vector3 Position
-        {
-            get { return position; }
-        }
-=======
-            
-        }   
-        
-        
-        
-
-
-        
->>>>>>> refs/remotes/origin/master
     }
 }
