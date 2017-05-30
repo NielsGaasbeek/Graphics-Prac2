@@ -11,3 +11,4 @@ D:\Users\Brian\Documents\GitHub\Graphics-Prac2\bin\Debug\template.pdb
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\bin\Debug\OpenTK.dll
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\obj\Debug\template.exe
 D:\Users\Brian\Documents\GitHub\Graphics-Prac2\obj\Debug\template.pdb
+D:\Users\Brian\Documents\GitHub\Graphics-Prac2\obj\Debug\template.csprojResolveAssemblyReference.cache

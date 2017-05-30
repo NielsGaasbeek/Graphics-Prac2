@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Drawing;
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-
 
 namespace Application
 {
@@ -89,9 +86,8 @@ namespace Application
                 tracer.renderCam.transform(0, -1, 0);
                 tracer.screen.Clear(0);
             }
-
-
         }
+
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.ClearColor(Color.Black);
@@ -106,8 +102,6 @@ namespace Application
                 Exit();
                 return;
             }
-
-
 
             // convert Game.screen to OpenGL texture
             GL.BindTexture(TextureTarget.Texture2D, screenID);
@@ -132,7 +126,6 @@ namespace Application
             GL.End();
             // tell OpenTK we're done rendering
 
-                        
             GL.Enable(EnableCap.DepthTest);
             GL.Disable(EnableCap.Texture2D);
             GL.Clear(ClearBufferMask.DepthBufferBit);

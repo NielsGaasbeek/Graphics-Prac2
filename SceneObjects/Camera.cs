@@ -12,8 +12,6 @@ namespace Application
         float d;
         //for FOV adjustment
         
-        
-
         public Camera(Vector3 position, Vector3 direction, float fov)
         {
             //turning degrees into radians and using them to calculate the distance to screen with a given FOV.
