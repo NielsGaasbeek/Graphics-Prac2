@@ -74,7 +74,7 @@ namespace Application
             }
             if (keyboard[Key.ControlLeft])
             {
-                if (tracer.renderCam.Position.Y < 0)
+                if (tracer.renderCam.position.Y < 0)
                 {
                     tracer.renderCam.transform(0, 1, 0);
                     tracer.screen.Clear(0);
