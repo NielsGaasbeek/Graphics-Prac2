@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using OpenTK.Graphics.OpenGL;
 using System;
 using System.Drawing;
 
@@ -49,7 +48,7 @@ namespace Application
             image = new Vector3[(width * height)];
 
             scene = new Scene(); //create the scene
-            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 90); //create the camera. the last argument is the FOV in degrees
+            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 70); //create the camera. the last argument is the FOV in degrees
             ray.O = renderCam.position;
 
             AA[0] = -1f / 4f; AA[1] = -1f / 4f;
@@ -57,8 +56,8 @@ namespace Application
             AA[4] = 1f / 4f; AA[5] = -1f / 4f;
             AA[6] = 1f / 4f; AA[7] = 1f / 4f;
 
-            environment = new Surface("../../assets/uffizi_probe.png");
-            floorTex = new Surface("../../assets/bikker.jpg"); //data for floor texture (only works with black/white for now)
+            environment = new Surface("../../assets/skydome.png");
+            floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
             for (int x = 0; x < 128; x++)
             {
                 for (int y = 0; y < 128; y++)
@@ -68,7 +67,6 @@ namespace Application
                     floorTexColors[x, y] = f;
                 }
             }
-
         }
 
         public void Render()
