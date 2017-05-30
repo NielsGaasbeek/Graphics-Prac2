@@ -46,8 +46,14 @@ namespace Application
             var keyboard = OpenTK.Input.Keyboard.GetState();
             if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
 
+<<<<<<< HEAD
             if (keyboard[Key.Space])
             { tracer.screen.Clear(0); tracer.Render(); }
+=======
+            //when you press a button to move the camera, the render screen will clear and will only start rendering after you press space.
+            //this makes moving the camera way smoother.
+            if (keyboard[Key.Space]) tracer.Render();
+>>>>>>> refs/remotes/origin/master
             if (keyboard[Key.A])
                 tracer.renderCam.transform(-1, 0, 0);
             if (keyboard[Key.D])
@@ -57,6 +63,7 @@ namespace Application
             if (keyboard[Key.S])
                 tracer.renderCam.transform(0, 0, -1);
             if (keyboard[Key.Right])
+<<<<<<< HEAD
                 tracer.renderCam.rotate(0, .1f);
             if (keyboard[Key.Left])
                 tracer.renderCam.rotate(0, -.1f);
@@ -66,6 +73,17 @@ namespace Application
                 tracer.renderCam.rotate(-.1f, 0);
             if (keyboard[Key.ControlLeft])
                 if (tracer.renderCam.position.Y < 0)
+=======
+            {
+                //tracer.renderCam.rotate();
+                //tracer.screen.Clear(0);
+            }
+            //an additional if statement to prevent the camera from going underneath the floor plane
+            if (keyboard[Key.ControlLeft])
+            {
+                if (tracer.renderCam.position.Y < 0)
+                {
+>>>>>>> refs/remotes/origin/master
                     tracer.renderCam.transform(0, 1, 0);
             if (keyboard[Key.ShiftLeft])
                 tracer.renderCam.transform(0, -1, 0);
