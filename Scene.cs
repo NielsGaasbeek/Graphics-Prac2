@@ -7,13 +7,11 @@ namespace Application
     {
         protected List<Light> lightList;
         protected List<Primitive> sceneObjects;
-        IList<Sphere> spheres;
 
         public Scene()
         {
             lightList = new List<Light>();
             sceneObjects = new List<Primitive>();
-            spheres = new List<Sphere>();
 
             FillScene();
         }
@@ -32,7 +30,6 @@ namespace Application
                     hitObject = P;
                 }
             }
-
             return new Intersection(tMin, hitObject, (R.O + (tMin * R.D)));
         }
 
@@ -45,12 +42,6 @@ namespace Application
         {
             get { return sceneObjects; }
         }
-
-        public IList<Sphere> Spheres
-        {
-            get { return spheres; }
-        }
-
 
         Sphere Sphere1, Sphere2, Sphere3;
         Plane Floor;
@@ -66,8 +57,9 @@ namespace Application
             Lights.Add(light2);
 
             Floor = new Plane( "Floor", new Vector3(0, 1, 0), -1, new Vector3(50, 50, 50), "Specular"); //gray floor plane
-            Sphere1 = new Sphere("Sphere1", new Vector3(-2, 0, 4), 1, new Vector3(255, 0, 0), "Diffuse"); //left sphere
-            Sphere2 = new Sphere("Sphere2", new Vector3(0, 0, 5), 1, new Vector3(1, 1, 1), "Mirror"); //middle sphere
+            Sphere1 = new Sphere("Sphere1", new Vector3(-2, 0, 4), 1, new Vector3(255, 0, 0), "Specular"); //left sphere
+            Sphere2 = new Sphere("Sphere2", new Vector3(0, 0, 5), 1, new Vector3(255, 255, 255), "Mirror"); //middle sphere
+
             Sphere3 = new Sphere("Sphere3", new Vector3(3, 0, 5), 1, new Vector3(0, 0, 255), "Specular"); //right sphere
 
             Triangle Triangle1 = new Triangle("Triangle1", new Vector3(0,1,3), new Vector3(1,-2,4), new Vector3(2,1,3), new Vector3(0,0,255),"Diffuse");
@@ -76,15 +68,12 @@ namespace Application
             sceneObjects.Add(Floor); //add the primitives
 
             sceneObjects.Add(Sphere1);
-            spheres.Add(Sphere1);
 
             sceneObjects.Add(Sphere2);
-            spheres.Add(Sphere2);
 
             sceneObjects.Add(Sphere3);
-            spheres.Add(Sphere3);
 
-            //sceneObjects.Add(Triangle1);
+            sceneObjects.Add(Triangle1);
         }
     }
 }

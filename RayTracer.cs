@@ -34,7 +34,6 @@ namespace Application
         public Scene scene;
 
         Ray ray = new Ray();
-        Vector3 point = new Vector3(0, 0, 0);
 
         //coordinate system
         float xmin = -5; float xmax = 5;
@@ -51,6 +50,7 @@ namespace Application
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 70); //create the camera. the last argument is the FOV in degrees
             ray.O = renderCam.position;
 
+            //offset-array used for Anti-Aliasing
             AA[0] = -1f / 4f; AA[1] = -1f / 4f;
             AA[2] = -1f / 4f; AA[3] = 1f / 4f;
             AA[4] = 1f / 4f; AA[5] = -1f / 4f;
@@ -76,26 +76,22 @@ namespace Application
                 for (int x = 0; x < width; x++)
                 {
                     Vector3 color = new Vector3(0, 0, 0);
-                    Intersection I = new Intersection(0f, null, color);
 
+                    Intersection I = null;
                     for (int sample = 0; sample < 4; sample++)
-                    {
-                        float u = (renderCam.p0.X + (renderCam.p1.X - renderCam.p0.X) * ((x + 0.5f + AA[2 * sample]) / 512));
-                        float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f + AA[2 * sample + 1]) / 512));
-                        float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
+                    {                        
+                        float normalized_x = (x + 0.5f + AA[2 * sample]) / width ;
+                        float normalized_y = (y + 0.5f + AA[2 * sample + 1]) / height;
 
-                        Vector3 dir = new Vector3(u, v, w) - renderCam.position; //die w was eerst 1
-
-
-                        float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
-                        Vector3 normDir = new Vector3(dir.X / normal, dir.Y / normal, dir.Z / normal);
-
-                        ray.D = normDir;
-
-                        ray.D = new Vector3(u, v, w) - renderCam.position;
+                        Vector3 imagePoint = renderCam.p0 + 
+                                            (normalized_x * renderCam.right_direction * 2) - 
+                                            (normalized_y * renderCam.up_direction * 2);
+                        Vector3 dir = imagePoint - renderCam.position;
+                        ray.D = dir;
 
                         ray.O = renderCam.position;
                         ray.Normalize();
+
 
                         I = scene.closestIntersect(ray);
                         if (I.Primitive != null)
@@ -144,7 +140,7 @@ namespace Application
 
             if (I.Primitive.PrimitiveMaterial.isMirror)
             {
-                if (recur < 8)
+                if (recur < 1)
                     return primColor * Trace(Reflect(ray, I), recur++);
                 return new Vector3(1, 1, 1);
             }
@@ -176,7 +172,7 @@ namespace Application
             Ray reflectRay = new Ray();
             Vector3 surfaceNormal = I.NormalVector;
 
-            reflectRay.D = ray.D - ((2 * surfaceNormal) * (dotProduct(ray.D, surfaceNormal)));
+            reflectRay.D = ray.D - ((2 * surfaceNormal) * (Vector3.Dot(ray.D, surfaceNormal)));
             reflectRay.O = I.IntersectPosition;
 
             return reflectRay;
@@ -198,7 +194,7 @@ namespace Application
                 if (!IsVisible(I, shadowRay, intersectDist)) continue;
 
                 float distAttenuation = l.Intensity / (intersectDist * intersectDist);
-                float NdotL = dotProduct(I.NormalVector, shadowRay.D);
+                float NdotL = Vector3.Dot(I.NormalVector, shadowRay.D);
                 if (NdotL < 0) continue;
                 color += l.Color * distAttenuation * NdotL;
                 continue;
@@ -228,38 +224,59 @@ namespace Application
         }
 
         // tick: renders one frame
-        public void Tick()
+        public void DebugOutput()
         {
-            //screen.Clear(0);
-            screen.Line(TX(5), TY(ymax), TX(5), TY(ymin), 0xffffff); //line in the middle to show border between render and debug screen
+            //screen.Clear(1);
+            screen.Line(TX(5), TY(ymax), TX(5), TY(ymin), 0xffffff);
 
             //debug view
-            //camera position
-            screen.Plot(TX(renderCam.position.X) + 512, TY(renderCam.position.Z), 0xffffff); //x + 512 to get it on the right half of the screen
+            //camera
+
+            screen.Plot(TX(renderCam.position.X) + 512, TY(renderCam.position.Z), 0xffffff); //x+512 voor rechterkant scherm
             screen.Plot(TX(renderCam.position.X) + 513, TY(renderCam.position.Z), 0xffffff);
-            //additional info about the camera's position and FOV
-            screen.Print("Camera: (" + Math.Round(renderCam.position.X, 1) + "; " + Math.Round(renderCam.position.Y, 1) + "; " + Math.Round(renderCam.position.Z, 1) + ")", 513, 5, 0xffffff);
-            screen.Print("FOV: " + renderCam.fovv, 513, 25, 0xffffff);
+            screen.Print("Camera: (" + Math.Round(renderCam.position.X, 1) + "; " + Math.Round(renderCam.position.Y, 1) + "; " + Math.Round(renderCam.position.Z, 1) + ")", 513, 25, 0xffffff);
+            screen.Print("Camera-Downward Angle: " + renderCam.camera_direction.Y, 720, 5, 0xffffff);
+            screen.Print("FOV: " + renderCam.fovv, 513, 5, 0xffffff);
 
             //screen plane
             screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
 
-            //draw the primitives
-            foreach (Sphere s in scene.Spheres)
+            foreach (Primitive p in scene.Primitives)
             {
-                Vector3 sphereColor = s.PrimitiveColor;
-                if (s.PrimitiveMaterial.isMirror)
-                    sphereColor = new Vector3(255, 255, 255);
-
-                for (float r = 0; r < 10; r += .1f)
+                if (p is Sphere)
                 {
+                    Sphere s = (Sphere)p;
+                    Vector3 sphereColor = s.PrimitiveColor;
+                    if (s.PrimitiveMaterial.isMirror)
+                        sphereColor = new Vector3(255, 255, 255);
+
+                    for (float r = 0; r < 10; r += .1f)
+                    {
+                        screen.Line(
+                            TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r))) + 512,
+                            TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r))),
+                            TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r + .1))) + 512,
+                            TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r + .1))),
+                            CreateColor((int)sphereColor.X, (int)sphereColor.Y, (int)sphereColor.Z)
+                            );
+                    }
+
+                }
+                else if (p is Triangle)
+                {
+                    Triangle t = (Triangle)p;
+                    Vector3 vert1 = t.v1 - t.v0;
+                    Vector3 vert2 = t.v2 - t.v1;
+                    //float labda = ;
+
                     screen.Line(
-                        TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r))) + 512,
-                        TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r))),
-                        TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r + .1))) + 512,
-                        TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r + .1))),
-                        CreateColor((int)sphereColor.X, (int)sphereColor.Y, (int)sphereColor.Z)
+                        TX(t.v0.X) + 512,
+                        TY(t.v0.Z),
+                        TX(t.v2.X) + 512,
+                        TY(t.v2.Z),
+                        CreateColor((int)t.PrimitiveColor.X, (int)t.PrimitiveColor.Y, (int)t.PrimitiveColor.Z)
                         );
+
                 }
             }
         }
@@ -279,7 +296,7 @@ namespace Application
             //draws reflective rays
             if (I.Primitive != null)
             {
-                if (I.IntersectPosition.X > 10  || I.IntersectPosition.X < -10 || I.IntersectPosition.Z > 10 || I.IntersectPosition.Z < -10) return;
+                if (I.IntersectPosition.X > xmax  || I.IntersectPosition.X < xmin || I.IntersectPosition.Z > ymax || I.IntersectPosition.Z < ymin) return;
 
                 if(I.Primitive.PrimitiveMaterial.isMirror || I.Primitive.PrimitiveMaterial.isSpecular)
                 {
@@ -344,11 +361,6 @@ namespace Application
         float Length(Vector3 vec)
         {
             return (float)Math.Sqrt((vec.X * vec.X) + (vec.Y * vec.Y) + (vec.Z * vec.Z));
-        }
-
-        public float dotProduct(Vector3 A, Vector3 B)
-        {
-            return ((A.X * B.X) + (A.Y * B.Y) + (A.Z * B.Z));
         }
 
         public Vector3 shadePoint(Vector3 P, Surface T) //volgens het boek, maar ik geloof niet dat dit helemaal nodig is

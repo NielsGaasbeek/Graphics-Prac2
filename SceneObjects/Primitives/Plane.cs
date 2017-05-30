@@ -17,7 +17,7 @@ namespace Application
         //function which calculates the distance t which a ray travels before it intersects the plane
         public override float Intersection(Ray R)
         {
-            float t = -(DotProduct(R.O, normalVector) + distance) / (DotProduct(R.D, normalVector));
+            float t = -(Vector3.Dot(R.O, normalVector) + distance) / (Vector3.Dot(R.D, normalVector));
             return t;
         }
 
