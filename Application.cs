@@ -44,35 +44,33 @@ namespace Application
             if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
 
             if (keyboard[Key.Space])
-            { tracer.screen.Clear(0); tracer.Render(); }
+            { tracer.Render(); }
 
             //when you press a button to move the camera, the render screen will clear and will only start rendering after you press space.
             //this makes moving the camera way smoother.
 
             if (keyboard[Key.A])
-                tracer.renderCam.transform(-1, 0, 0);
+            { tracer.renderCam.transform(-1, 0, 0); tracer.screen.Clear(0); }
             if (keyboard[Key.D])
-                tracer.renderCam.transform(1, 0, 0);
+            { tracer.renderCam.transform(1, 0, 0); tracer.screen.Clear(0); }
             if (keyboard[Key.W])
-                tracer.renderCam.transform(0, 0, 1);
+            { tracer.renderCam.transform(0, 0, 1); tracer.screen.Clear(0); }
             if (keyboard[Key.S])
-                tracer.renderCam.transform(0, 0, -1);
+            { tracer.renderCam.transform(0, 0, -1); tracer.screen.Clear(0); }
             if (keyboard[Key.Right])
-                tracer.renderCam.rotate(0, .1f);
+            { tracer.renderCam.rotate(0, .1f); tracer.screen.Clear(0); }
             if (keyboard[Key.Left])
-                tracer.renderCam.rotate(0, -.1f);
+            { tracer.renderCam.rotate(0, -.1f); tracer.screen.Clear(0); }
             if (keyboard[Key.Up])
-                tracer.renderCam.rotate(.1f, 0);
+            { tracer.renderCam.rotate(.1f, 0); tracer.screen.Clear(0); }
             if (keyboard[Key.Down])
-                tracer.renderCam.rotate(-.1f, 0);
-            if (keyboard[Key.ControlLeft])
-                if (tracer.renderCam.position.Y < 0)
+            { tracer.renderCam.rotate(-.1f, 0); tracer.screen.Clear(0); }
             //an additional if statement to prevent the camera from going underneath the floor plane
             if (keyboard[Key.ControlLeft])
                 if (tracer.renderCam.position.Y < 0)
-                    tracer.renderCam.transform(0, 1, 0);
+                { tracer.renderCam.transform(0, 1, 0); tracer.screen.Clear(0); }
             if (keyboard[Key.ShiftLeft])
-                tracer.renderCam.transform(0, -1, 0);
+            { tracer.renderCam.transform(0, -1, 0); tracer.screen.Clear(0); }
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
