@@ -17,12 +17,21 @@ down: Downarrow
 right: Rightarrow
 left: Leftarrow
 
-When you touch the controls, the rendered imaga will not change. to render the scene, press space.
+When you touch the controls, the rendered image will dissappear and the camera-position can be seen in the debug-screen. 
+After you have selected the desired location and orientation, you can then press space to rerender the scene.
 
 How to add scene objects:
-Spheres: string ID, Vector3 position, float radius, vector3 color, string material("Diffuse", "Specular", "Mirror")
+Spheres: string ID, Vector3 position, float radius, vector3 color, string material
 Plane: string ID, Vector3 NormalVector, float distance to origin, Vector3 color, string material
 Triangle: string ID, Vector3 vertice0, Vector3 vertice1, Vector3 vertice2, Vector 3 color, string material
+Light: Vector3 position, Vector3 color, int intensity
+
+The specified string material can be one of the set {"Diffuse", "Specular", "Mirror"}
+, it will default to Diffuse if the material is not recognised
+
+After creating the scene object, it has to be added to the appropriate List:
+-Primitives go to sceneObjects.Add()
+-Lights go to Lights.Add()
 
 Bonus assignments:
 Textured Skydome
