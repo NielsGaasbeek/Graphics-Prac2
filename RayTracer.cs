@@ -231,18 +231,20 @@ namespace Application
         public void Tick()
         {
             //screen.Clear(0);
-            screen.Line(TX(5), TY(ymax), TX(5), TY(ymin), 0xffffff);
+            screen.Line(TX(5), TY(ymax), TX(5), TY(ymin), 0xffffff); //line in the middle to show border between render and debug screen
 
             //debug view
-            //camera
-            screen.Plot(TX(renderCam.position.X) + 512, TY(renderCam.position.Z), 0xffffff); //x+512 voor rechterkant scherm
+            //camera position
+            screen.Plot(TX(renderCam.position.X) + 512, TY(renderCam.position.Z), 0xffffff); //x + 512 to get it on the right half of the screen
             screen.Plot(TX(renderCam.position.X) + 513, TY(renderCam.position.Z), 0xffffff);
+            //additional info about the camera's position and FOV
             screen.Print("Camera: (" + Math.Round(renderCam.position.X, 1) + "; " + Math.Round(renderCam.position.Y, 1) + "; " + Math.Round(renderCam.position.Z, 1) + ")", 513, 5, 0xffffff);
             screen.Print("FOV: " + renderCam.fovv, 513, 25, 0xffffff);
 
             //screen plane
             screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
 
+            //draw the primitives
             foreach (Sphere s in scene.Spheres)
             {
                 Vector3 sphereColor = s.PrimitiveColor;
