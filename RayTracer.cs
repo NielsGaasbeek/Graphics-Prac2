@@ -50,7 +50,7 @@ namespace Application
 
             scene = new Scene(); //create the scene
             renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 90); //create the camera. the last argument is the FOV in degrees
-            ray.O = renderCam.Position;
+            ray.O = renderCam.position;
 
             AA[0] = -1f / 4f; AA[1] = -1f / 4f;
             AA[2] = -1f / 4f; AA[3] = 1f / 4f;
@@ -86,7 +86,7 @@ namespace Application
                         float v = (renderCam.p0.Y + (renderCam.p2.Y - renderCam.p0.Y) * ((y + 0.5f + AA[2 * sample + 1]) / 512));
                         float w = (renderCam.p0.Z + (renderCam.p2.Z - renderCam.p0.Z) * ((y + 0.5f) / 512)); //deze regel was er eerst niet
 
-                        Vector3 dir = new Vector3(u, v, w) - renderCam.Position; //die w was eerst 1
+                        Vector3 dir = new Vector3(u, v, w) - renderCam.position; //die w was eerst 1
 
 
                         float normal = (float)Math.Sqrt((dir.X * dir.X) + (dir.Y * dir.Y) + (dir.Z * dir.Z));
@@ -94,9 +94,9 @@ namespace Application
 
                         ray.D = normDir;
 
-                        ray.D = new Vector3(u, v, w) - renderCam.Position;
+                        ray.D = new Vector3(u, v, w) - renderCam.position;
 
-                        ray.O = renderCam.Position;
+                        ray.O = renderCam.position;
                         ray.Normalize();
 
                         I = scene.closestIntersect(ray);
@@ -218,8 +218,8 @@ namespace Application
         {
             //bereken HDR coords
             float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y));
-            float HDRx = MathHelper.Clamp(((ray.D.X * r + 1) * 750), 0, 1499);
-            float HDRy = MathHelper.Clamp(((ray.D.Y * r + 1) * 750), 0, 1499);
+            float HDRx = MathHelper.Clamp(((ray.D.X * r + 1) * environment.width/2), 0, environment.width - 1);
+            float HDRy = MathHelper.Clamp(((ray.D.Y * r + 1) * environment.height/2), 0, environment.height - 1);
             Color pixelCol = environment.bmp.GetPixel((int)HDRx, (int)HDRy);
             return new Vector3(pixelCol.R, pixelCol.G, pixelCol.B);
         }
@@ -242,10 +242,10 @@ namespace Application
 
             //debug view
             //camera
-            screen.Plot(TX(renderCam.Position.X) + 512, TY(renderCam.Position.Z), 0xffffff); //x+512 voor rechterkant scherm
-            screen.Plot(TX(renderCam.Position.X) + 513, TY(renderCam.Position.Z), 0xffffff);
+            screen.Plot(TX(renderCam.position.X) + 512, TY(renderCam.position.Z), 0xffffff); //x+512 voor rechterkant scherm
+            screen.Plot(TX(renderCam.position.X) + 513, TY(renderCam.position.Z), 0xffffff);
             screen.Print("Camera: (" + Math.Round(renderCam.position.X, 1) + "; " + Math.Round(renderCam.position.Y, 1) + "; " + Math.Round(renderCam.position.Z, 1) + ")", 513, 5, 0xffffff);
-            screen.Print("FOV: " + renderCam.fov, 513, 25, 0xffffff);
+            screen.Print("FOV: " + renderCam.fovv, 513, 25, 0xffffff);
 
             //screen plane
             screen.Line(TX(renderCam.p0.X) + 512, TY(renderCam.p0.Z), TX(renderCam.p1.X) + 512, TY(renderCam.p1.Z), 0xffffff);
