@@ -46,6 +46,8 @@ namespace Application
             var keyboard = OpenTK.Input.Keyboard.GetState();
             if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
 
+            //when you press a button to move the camera, the render screen will clear and will only start rendering after you press space.
+            //this makes moving the camera way smoother.
             if (keyboard[Key.Space]) tracer.Render();
             if (keyboard[Key.A])
             {
@@ -72,6 +74,7 @@ namespace Application
                 //tracer.renderCam.rotate();
                 //tracer.screen.Clear(0);
             }
+            //an additional if statement to prevent the camera from going underneath the floor plane
             if (keyboard[Key.ControlLeft])
             {
                 if (tracer.renderCam.position.Y < 0)
