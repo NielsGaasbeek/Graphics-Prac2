@@ -7,13 +7,11 @@ namespace Application
     {
         protected List<Light> lightList;
         protected List<Primitive> sceneObjects;
-        IList<Sphere> spheres;
 
         public Scene()
         {
             lightList = new List<Light>();
             sceneObjects = new List<Primitive>();
-            spheres = new List<Sphere>();
 
             FillScene();
         }
@@ -32,7 +30,6 @@ namespace Application
                     hitObject = P;
                 }
             }
-
             return new Intersection(tMin, hitObject, (R.O + (tMin * R.D)));
         }
 
@@ -45,12 +42,6 @@ namespace Application
         {
             get { return sceneObjects; }
         }
-
-        public IList<Sphere> Spheres
-        {
-            get { return spheres; }
-        }
-
 
         Sphere Sphere1, Sphere2, Sphere3;
         Plane Floor;
@@ -76,15 +67,12 @@ namespace Application
             sceneObjects.Add(Floor); //add the primitives
 
             sceneObjects.Add(Sphere1);
-            spheres.Add(Sphere1);
 
             sceneObjects.Add(Sphere2);
-            spheres.Add(Sphere2);
 
             sceneObjects.Add(Sphere3);
-            spheres.Add(Sphere3);
 
-            //sceneObjects.Add(Triangle1);
+            sceneObjects.Add(Triangle1);
         }
     }
 }

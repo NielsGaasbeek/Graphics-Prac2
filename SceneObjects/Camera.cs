@@ -36,15 +36,6 @@ namespace Application
         }
         public void rotate(float up, float right)
         {
-            /*
-            camera_direction.Y += up;
-            camera_direction.X += right;
-            */
-
-            /*
-            theta += up;
-            phi += right;
-            */
             camera_direction += (right * right_direction);
             camera_direction += (up * up_direction);
 
@@ -57,10 +48,10 @@ namespace Application
             Vector3 normalized_direction = Normalize(camera_direction);
 
             screenCenter = position + d * normalized_direction;
-
-            right_direction = RayTracer.CrossProduct(normalized_direction, up_direction);
+            
+            right_direction = Vector3.Cross(normalized_direction, up_direction);
             right_direction = Normalize(right_direction);
-            up_direction = RayTracer.CrossProduct(right_direction, normalized_direction);
+            up_direction = Vector3.Cross(right_direction, normalized_direction);
             up_direction = Normalize(up_direction);
 
             //corners, transform camera by multiplying E,p0,1,2 with camera matrix

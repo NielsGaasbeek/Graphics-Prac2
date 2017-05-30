@@ -33,21 +33,6 @@ namespace Application
             return new Vector3(0, 0, 0);
         }
 
-        public float DotProduct(Vector3 A, Vector3 B)
-        {
-            return A.X * B.X + A.Y * B.Y + A.Z * B.Z;
-        }
-
-        public Vector3 CrossProduct(Vector3 A, Vector3 B)
-        {
-            Vector3 crossProduct;
-            crossProduct.X = (A.Y * B.Z) - (A.Z * B.Y);
-            crossProduct.Y = (A.Z * B.X) - (A.X * B.Z);
-            crossProduct.Z = (A.X * B.Y) - (A.Y * B.X);
-
-            return crossProduct;
-        }
-
         public string PrimitiveID
         { get { return ID; } }
         public Vector3 PrimitivePosition

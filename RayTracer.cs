@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using OpenTK.Graphics.OpenGL;
 using System;
 using System.Drawing;
 
@@ -86,9 +85,10 @@ namespace Application
                         float normalized_x = (x + 0.5f + AA[2 * sample]) / width ;
                         float normalized_y = (y + 0.5f + AA[2 * sample + 1]) / height;
 
-                        Vector3 imagePoint = renderCam.p0 + (normalized_x * renderCam.right_direction * 2) - (normalized_y * renderCam.up_direction * 2);
+                        Vector3 imagePoint = renderCam.p0 + 
+                                            (normalized_x * renderCam.right_direction * 2) - 
+                                            (normalized_y * renderCam.up_direction * 2);
                         Vector3 dir = imagePoint - renderCam.position;
-
                         ray.D = dir;
 
                         ray.O = renderCam.position;
@@ -179,7 +179,7 @@ namespace Application
             Ray reflectRay = new Ray();
             Vector3 surfaceNormal = I.NormalVector;
 
-            reflectRay.D = ray.D - ((2 * surfaceNormal) * (dotProduct(ray.D, surfaceNormal)));
+            reflectRay.D = ray.D - ((2 * surfaceNormal) * (Vector3.Dot(ray.D, surfaceNormal)));
             reflectRay.O = I.IntersectPosition;
 
             return reflectRay;
@@ -201,7 +201,7 @@ namespace Application
                 if (!IsVisible(I, shadowRay, intersectDist)) continue;
 
                 float distAttenuation = l.Intensity / (intersectDist * intersectDist);
-                float NdotL = dotProduct(I.NormalVector, shadowRay.D);
+                float NdotL = Vector3.Dot(I.NormalVector, shadowRay.D);
                 if (NdotL < 0) continue;
                 color += l.Color * distAttenuation * NdotL;
                 continue;
@@ -233,7 +233,7 @@ namespace Application
         // tick: renders one frame
         public void DebugOutput()
         {
-            //screen.Clear(0);
+            //screen.Clear(1);
             screen.Line(TX(5), TY(ymax), TX(5), TY(ymin), 0xffffff);
 
             //debug view
@@ -250,21 +250,42 @@ namespace Application
 
             screen.Print("Camera-Downward Angle: " + renderCam.camera_direction.Y, 720, 5, 0xffffff);
 
-            foreach (Sphere s in scene.Spheres)
+            foreach (Primitive p in scene.Primitives)
             {
-                Vector3 sphereColor = s.PrimitiveColor;
-                if (s.PrimitiveMaterial.isMirror)
-                    sphereColor = new Vector3(255, 255, 255);
-
-                for (float r = 0; r < 10; r += .1f)
+                if (p is Sphere)
                 {
+                    Sphere s = (Sphere)p;
+                    Vector3 sphereColor = s.PrimitiveColor;
+                    if (s.PrimitiveMaterial.isMirror)
+                        sphereColor = new Vector3(255, 255, 255);
+
+                    for (float r = 0; r < 10; r += .1f)
+                    {
+                        screen.Line(
+                            TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r))) + 512,
+                            TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r))),
+                            TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r + .1))) + 512,
+                            TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r + .1))),
+                            CreateColor((int)sphereColor.X, (int)sphereColor.Y, (int)sphereColor.Z)
+                            );
+                    }
+
+                }
+                else if (p is Triangle)
+                {
+                    Triangle t = (Triangle)p;
+                    Vector3 vert1 = t.v1 - t.v0;
+                    Vector3 vert2 = t.v2 - t.v1;
+                    //float labda = ;
+
                     screen.Line(
-                        TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r))) + 512,
-                        TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r))),
-                        TX((float)(s.PrimitivePosition.X + s.Radius * Math.Cos(r + .1))) + 512,
-                        TY((float)(s.PrimitivePosition.Z + s.Radius * Math.Sin(r + .1))),
-                        CreateColor((int)sphereColor.X, (int)sphereColor.Y, (int)sphereColor.Z)
+                        TX(t.v0.X) + 512,
+                        TY(t.v0.Z),
+                        TX(t.v2.X) + 512,
+                        TY(t.v2.Z),
+                        CreateColor((int)t.PrimitiveColor.X, (int)t.PrimitiveColor.Y, (int)t.PrimitiveColor.Z)
                         );
+
                 }
             }
         }
@@ -349,20 +370,6 @@ namespace Application
         float Length(Vector3 vec)
         {
             return (float)Math.Sqrt((vec.X * vec.X) + (vec.Y * vec.Y) + (vec.Z * vec.Z));
-        }
-
-        public static float dotProduct(Vector3 A, Vector3 B)
-        {
-            return ((A.X * B.X) + (A.Y * B.Y) + (A.Z * B.Z));
-        }
-        public static Vector3 CrossProduct(Vector3 A, Vector3 B)
-        {
-            Vector3 crossProduct;
-            crossProduct.X = (A.Y * B.Z) - (A.Z * B.Y);
-            crossProduct.Y = (A.Z * B.X) - (A.X * B.Z);
-            crossProduct.Z = (A.X * B.Y) - (A.Y * B.X);
-
-            return crossProduct;
         }
 
         public Vector3 shadePoint(Vector3 P, Surface T) //volgens het boek, maar ik geloof niet dat dit helemaal nodig is
