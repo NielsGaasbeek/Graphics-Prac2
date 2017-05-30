@@ -58,7 +58,7 @@ namespace Application
             AA[6] = 1f / 4f; AA[7] = 1f / 4f;
 
             environment = new Surface("../../assets/uffizi_probe.png");
-            floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
+            floorTex = new Surface("../../assets/bikker.jpg"); //data for floor texture (only works with black/white for now)
             for (int x = 0; x < 128; x++)
             {
                 for (int y = 0; y < 128; y++)
@@ -144,16 +144,11 @@ namespace Application
 
             Vector3 primColor = I.Primitive.PrimitiveColor;
 
-
             if (I.Primitive.PrimitiveMaterial.isMirror)
             {
                 if (recur < 8)
                     return primColor * Trace(Reflect(ray, I), recur++);
                 return new Vector3(1, 1, 1);
-            }
-            else if (I.Primitive.PrimitiveMaterial.isDiElectric)
-            {
-
             }
             else if (I.Primitive.PrimitiveMaterial.isSpecular)
             {
@@ -218,8 +213,8 @@ namespace Application
         {
             //bereken HDR coords
             float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y));
-            float HDRx = MathHelper.Clamp(((ray.D.X * r + 1) * 750), 0, 1499);
-            float HDRy = MathHelper.Clamp(((ray.D.Y * r + 1) * 750), 0, 1499);
+            float HDRx = MathHelper.Clamp(((ray.D.X * r + 1) * environment.width / 2), 0, environment.width - 1);
+            float HDRy = MathHelper.Clamp(((ray.D.Y * r + 1) * environment.height / 2), 0, environment.height - 1);
             Color pixelCol = environment.bmp.GetPixel((int)HDRx, (int)HDRy);
             return new Vector3(pixelCol.R, pixelCol.G, pixelCol.B);
         }
@@ -359,11 +354,12 @@ namespace Application
         public Vector3 shadePoint(Vector3 P, Surface T) //volgens het boek, maar ik geloof niet dat dit helemaal nodig is
         {
             Vector2 coord = new Vector2(P.X, P.Z);
-            float f = textureLookup(T, coord.X, coord.Y);
-            return new Vector3((int)f * 255, (int)f * 255, (int)f * 255);
+            //float f = textureLookup(T, coord.X, coord.Y);
+            //return new Vector3((int)f * 255, (int)f * 255, (int)f * 255);
+            return textureLookup(T, coord.X, coord.Y);
         }
 
-        public float textureLookup(Surface T, float u, float v)
+        public Vector3 textureLookup(Surface T, float u, float v)
         {
             //plane is veel groter dan de texture, dus als de positie buiten de texture (0-128) valt, coordinaten opschuiven
             int i = (int)Math.Round(u * T.width - 0.5);
@@ -384,7 +380,8 @@ namespace Application
             {
                 j -= 128;
             }
-            return floorTexColors[i, j];
+            Color col = floorTex.bmp.GetPixel(i, j);
+            return new Vector3(col.R, col.G, col.B);
         }
     }
 }
