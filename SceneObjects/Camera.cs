@@ -7,6 +7,7 @@ namespace Application
     {
         public Vector3 position, direction, screenCenter;
         public Vector3 p0, p1, p2; //screen corners
+        public float fovv;
         public float FOV;
         float d;
         //for FOV adjustment
@@ -15,6 +16,7 @@ namespace Application
 
         public Camera(Vector3 position, Vector3 direction, float fov)
         {
+            fovv = fov;
             FOV = fov*(float)Math.PI/180;
             d = 1 / (float)(Math.Tan(FOV / 2));
 
@@ -45,7 +47,11 @@ namespace Application
         
            
         
-        
+        public float fov
+        {
+            get { return fovv; }
+        }
+
         public Vector3 Position
         {
             get { return position; }
