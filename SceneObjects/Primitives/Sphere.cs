@@ -12,32 +12,27 @@ namespace Application
             radius = r;
         }
 
+        //method to find an intersection
         public override float Intersection(Ray R)
         {
-            float a = Vector3.Dot(R.D, R.D);
-            float b = Vector3.Dot(2 * R.D, (R.O - PrimitivePosition));
-            float c = Vector3.Dot((R.O - PrimitivePosition), (R.O - PrimitivePosition)) - (radius * radius);
-
-            float D = (float)Math.Sqrt((b*b)-(4*a*c));
-            if(D >= 0)
-            {
-                Vector3 C = PrimitivePosition - R.O;
-                float t = Vector3.Dot(C, R.D);
-                Vector3 q = C - t * R.D;
-                float p2 = Vector3.Dot(q, q);
-                if (p2 > (radius * radius)) { return 0; }
-                t -= (float)Math.Sqrt((radius * radius) - p2);
-                if ((t < R.t) && (t > 0f)) { R.t = t; }
-                return t;
-            }
-            else return 0;
+            //Jacco's intersection calculation from the ray tracing presentation
+            Vector3 C = PrimitivePosition - R.O; 
+            float t = Vector3.Dot(C, R.D);
+            Vector3 q = C - t * R.D;
+            float p2 = Vector3.Dot(q, q);
+            if (p2 > (radius * radius)) { return 0; } //if p^2 is greater than the sphere's radius^2, we are sure that we miss the sphere and we stop
+            t -= (float)Math.Sqrt((radius * radius) - p2); //otherwise we continue calculation and return the distance t of the calculation
+            if ((t < R.t) && (t > 0f)) { R.t = t; }
+            return t;
         }
 
+        //returns the normal at a given position on the sphere
         public override Vector3 NormalVector(Vector3 pos)
         {
             return (PrimitivePosition - pos).Normalized();
         }
 
+        //returns the radius
         public float Radius
         {
             get { return radius; }

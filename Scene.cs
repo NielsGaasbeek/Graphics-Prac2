@@ -16,21 +16,22 @@ namespace Application
             FillScene();
         }
 
+        //method to find the closest intersection in the scene
         public Intersection closestIntersect(Ray R)
         {
-            float tMin = int.MaxValue;
-            Primitive hitObject = null;
+            float tMin = int.MaxValue; //start with the ray distance at (imaginary) infinite
+            Primitive hitObject = null; //nothing has been hit yet
 
-            foreach (Primitive P in sceneObjects)
+            foreach (Primitive P in sceneObjects) //check for each primitive
             {
-                float t = P.Intersection(R);
-                if ( t > 0 && t < tMin)
+                float t = P.Intersection(R); //the distance of the intersection
+                if ( t > 0 && t < tMin) //if there is an interssection and it's distance is smaller than the privious smallest
                 {
-                    tMin = t;
-                    hitObject = P;
+                    tMin = t; //set the closest to the one we just found
+                    hitObject = P; //set the primitive to the one we just found
                 }
             }
-            return new Intersection(tMin, hitObject, (R.O + (tMin * R.D)));
+            return new Intersection(tMin, hitObject, (R.O + (tMin * R.D))); //return the closest intersection
         }
 
         public IList<Light> Lights
@@ -46,9 +47,11 @@ namespace Application
         Sphere Sphere1, Sphere2, Sphere3;
         Plane Floor;
 
+        //method to fill the scene
         public void FillScene()
         {
-            Light light1 = new Light(new Vector3(-2, -2, 1), new Vector3(1, 0, 0), 10); //add a light to the scene
+            //add lights to the scene
+            Light light1 = new Light(new Vector3(-2, -2, 1), new Vector3(1, 0, 0), 10); 
             Light light2 = new Light(new Vector3(2, -2, 7), new Vector3(0, 1, 0), 10);
             Light bigLight = new Light(new Vector3(0, -3, 2), new Vector3(1, 1, 1), 25);
 
@@ -56,6 +59,7 @@ namespace Application
             Lights.Add(light1);
             Lights.Add(light2);
 
+            //add primitives to the scene
             Floor = new Plane( "Floor", new Vector3(0, 1, 0), -1, new Vector3(50, 50, 50), "Specular"); //gray floor plane
             Sphere1 = new Sphere("Sphere1", new Vector3(-2, 0, 4), 1, new Vector3(255, 0, 0), "Specular"); //left sphere
             Sphere2 = new Sphere("Sphere2", new Vector3(0, 0, 5), 1, new Vector3(255, 255, 255), "Mirror"); //middle sphere

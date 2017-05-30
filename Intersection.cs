@@ -7,9 +7,9 @@ namespace Application
         float intersectDist;
         Vector3 intersectPos;
         Primitive intersectObj;
-
         Vector3 intersectNormal;
 
+        //constructor for an intersection. It stores the distance, primitive, position and the normal
         public Intersection(float t, Primitive P, Vector3 pos)
         {
             intersectDist = t;
