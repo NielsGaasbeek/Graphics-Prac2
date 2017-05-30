@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Drawing;
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-
 
 namespace Application
 {
@@ -91,8 +88,6 @@ namespace Application
                 return;
             }
 
-
-
             // convert Game.screen to OpenGL texture
             GL.BindTexture(TextureTarget.Texture2D, screenID);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
@@ -116,7 +111,6 @@ namespace Application
             GL.End();
             // tell OpenTK we're done rendering
 
-                        
             GL.Enable(EnableCap.DepthTest);
             GL.Disable(EnableCap.Texture2D);
             GL.Clear(ClearBufferMask.DepthBufferBit);

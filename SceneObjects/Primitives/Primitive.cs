@@ -13,7 +13,6 @@ namespace Application
         Material material;
         string ID;
 
-
         public Primitive(string ID, Vector3 color, Vector3 pos, string mat)
         {
             this.ID = ID;

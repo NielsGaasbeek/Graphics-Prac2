@@ -22,9 +22,8 @@ namespace Application
         // member variables
         public Surface screen;
 
-        Surface floorTex;
-        Surface environment; //HDR picture
-        float[,] floorTexColors = new float[128, 128];
+        Surface floorTex; //texture for the floor plane
+        Surface environment; //texture for skydome
 
         //screen-restricting variables
         int width = 512, height = 512;
@@ -33,10 +32,10 @@ namespace Application
         //Anti-Aliasing offset-array
         float[] AA = new float[4*2];
 
-        public Camera renderCam;
-        public Scene scene;
+        public Camera renderCam; //camera
+        public Scene scene; //scene which contains the primitives
 
-        Ray ray;
+        Ray ray; //the ray that will be used as primary ray
 
         //coordinate system
         float xmin = -5; float xmax = 5;
@@ -51,7 +50,7 @@ namespace Application
             ray = new Ray();
 
             scene = new Scene(); //create the scene
-            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 90); //create the camera. the last argument is the FOV in degrees
+            renderCam = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 70); //create the camera. the last argument is the FOV in degrees
             ray.O = renderCam.position;
 
             //offset-array used for Anti-Aliasing
@@ -61,17 +60,8 @@ namespace Application
             AA[4] = 1f / 4f; AA[5] = -1f / 4f;
             AA[6] = 1f / 4f; AA[7] = 1f / 4f;
 
-            environment = new Surface("../../assets/uffizi_probe.png");
-            floorTex = new Surface("../../assets/pattern.png"); //data for floor texture (only works with black/white for now)
-            for (int x = 0; x < 128; x++)
-            {
-                for (int y = 0; y < 128; y++)
-                {
-                    float f = ((float)(floorTex.pixels[x + y * 128] & 255)) / 256;
-                    if (f > 0) { f = 1; }
-                    floorTexColors[x, y] = f;
-                }
-            }
+            environment = new Surface("../../assets/skydome.png"); //load the skydome texture
+            floorTex = new Surface("../../assets/pattern.png"); //load the floor texture
         }
 
         public void Render()
@@ -243,14 +233,15 @@ namespace Application
             return false;
         }
 
+        //method used to draw the skydome if a rays doesn't hit anything.
         public Vector3 GetEnvironment(Ray ray)
         {
-            //bereken HDR coords
+            //calculate the r, x and y according to the formulas from http://www.pauldebevec.com/Probes/
             float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y));
-            float HDRx = MathHelper.Clamp(((ray.D.X * r + 1) * environment.width/2), 0, environment.width - 1);
-            float HDRy = MathHelper.Clamp(((ray.D.Y * r + 1) * environment.height/2), 0, environment.height - 1);
-            Color pixelCol = environment.bmp.GetPixel((int)HDRx, (int)HDRy);
-            return new Vector3(pixelCol.R, pixelCol.G, pixelCol.B);
+            float HDRx = MathHelper.Clamp(((ray.D.X * r + 1) * environment.width / 2), 0, environment.width - 1);
+            float HDRy = MathHelper.Clamp(((ray.D.Y * r + 1) * environment.height / 2), 0, environment.height - 1);
+            Color pixelCol = environment.bmp.GetPixel((int)HDRx, (int)HDRy); //find the color of the pixel 
+            return new Vector3(pixelCol.R, pixelCol.G, pixelCol.B); //return the color
         }
 
 
@@ -390,40 +381,37 @@ namespace Application
             return (red << 16) + (green << 8) + blue;
         }
 
+        //returns the lenght of a vector
         float Length(Vector3 vec)
         {
             return (float)Math.Sqrt((vec.X * vec.X) + (vec.Y * vec.Y) + (vec.Z * vec.Z));
         }
 
-        public Vector3 shadePoint(Vector3 P, Surface T) //volgens het boek, maar ik geloof niet dat dit helemaal nodig is
+        //method to texture the floorplane
+        public Vector3 shadePoint(Vector3 P, Surface T)
         {
-            Vector2 coord = new Vector2(P.X, P.Z);
-            float f = textureLookup(T, coord.X, coord.Y);
-            return new Vector3((int)f * 255, (int)f * 255, (int)f * 255);
-        }
+            Vector2 coord = new Vector2(P.X, P.Z); //get the coordinates
 
-        public float textureLookup(Surface T, float u, float v)
-        {
-            //plane is veel groter dan de texture, dus als de positie buiten de texture (0-128) valt, coordinaten opschuiven
-            int i = (int)Math.Round(u * T.width - 0.5);
-            while (i < 0)
+            int i = (int)Math.Round(coord.X * T.width - 0.5); //calculate where on the texture the coordinate is
+            while (i < 0) //because the plane is bigger than the texture, we check if the coordinate is on the texture. if not, we move it until it is
             {
-                i += 128;
+                i += T.width;
             }
-            while (i >= 128)
+            while (i >= T.width)
             {
-                i -= 128;
+                i -= T.width;
             }
-            int j = (int)Math.Round(v * T.height - 0.5);
+            int j = (int)Math.Round(coord.Y * T.height - 0.5);
             while (j < 0)
             {
-                j += 128;
+                j += T.height;
             }
-            while (j >= 128)
+            while (j >= T.height)
             {
-                j -= 128;
+                j -= T.height;
             }
-            return floorTexColors[i, j];
+            Color col = floorTex.bmp.GetPixel(i, j); //get the color of the pixel at the coordinates
+            return new Vector3(col.R, col.G, col.B); //return the color
         }
     }
 }
