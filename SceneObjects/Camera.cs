@@ -16,6 +16,7 @@ namespace Application
 
         public Camera(Vector3 position, Vector3 direction, float fov)
         {
+            //turning degrees into radians and using them to calculate the distance to screen with a given FOV.
             fovv = fov;
             FOV = fov*(float)Math.PI/180;
             d = 1 / (float)(Math.Tan(FOV / 2));
@@ -42,19 +43,13 @@ namespace Application
         }
         public void rotate()
         {
-
-        }
+            
+        }   
         
-           
         
-        public float fov
-        {
-            get { return fovv; }
-        }
+        
 
-        public Vector3 Position
-        {
-            get { return position; }
-        }
+
+        
     }
 }
